@@ -32,10 +32,10 @@ namespace SchoolWebAPI.Controllers
             logger.Info("GET | Requested for the list of all students");
             if (students.Count == 0)
             {
-                return new CustomResponse<string,string>(Request, (int)ResultStatus.Success, "No student Records found!");
+                return new CustomResponse<string>(Request, (int)ResultStatus.Success, "No student Records found!");
             }
 
-            return new CustomResponse<IList<StudentViewModel>, string>(Request, (int)ResultStatus.Success, "", students);
+            return new CustomResponse<IList<StudentViewModel>>(Request, (int)ResultStatus.Success, "", students);
         }
 
         [HttpGet]
@@ -57,10 +57,10 @@ namespace SchoolWebAPI.Controllers
             if (student == null)
             {
                 logger.Info("GET | Requested information of student with id=" + id + " not found!");
-                return new CustomResponse<string, string>(Request, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
+                return new CustomResponse<string>(Request, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
             }
             logger.Info("GET | Requested the information of student with id=" + id);
-            return new CustomResponse<StudentViewModel, string>(Request, (int)ResultStatus.Success, "", student);
+            return new CustomResponse<StudentViewModel>(Request, (int)ResultStatus.Success, "", student);
         }
 
         public IHttpActionResult Post([FromBody] StudentViewModel model)
@@ -72,7 +72,7 @@ namespace SchoolWebAPI.Controllers
                     if(model.standardId != null && !ctx.Standards.AsEnumerable().Any(s => s.StandardId == model.standardId))
                     {
                         logger.Error("POST | Addition of the student data with StandardId=" + model.standardId + " is violating the foreign key constraint!");
-                        return new CustomResponse<string, string>(Request, (int)ResultStatus.Failed, "StandardId=" + model.standardId + " is violating the constraints!");
+                        return new CustomResponse<string>(Request, (int)ResultStatus.Failed, "StandardId=" + model.standardId + " is violating the constraints!");
                     }
                     ctx.Students.Add(new Student
                     {
@@ -81,14 +81,14 @@ namespace SchoolWebAPI.Controllers
                     });
                     ctx.SaveChanges();
                     logger.Info("POST | New student data added");
-                    return new CustomResponse<string, string>(Request, (int)ResultStatus.Success, "Student details inserted successfully!");
+                    return new CustomResponse<string>(Request, (int)ResultStatus.Success, "Student details inserted successfully!");
                 }
             }
             else
             {
                 var errors = GetModelStateErrors(ModelState);
                 logger.Error("POST | Addition of the student data violating the modal state!");
-                return new CustomResponse<string, List<string>>(Request, (int)ResultStatus.Failed, errors, "");
+                return new CustomResponse<string>(Request, (int)ResultStatus.Failed, errors);
             }
         }
 
@@ -104,31 +104,31 @@ namespace SchoolWebAPI.Controllers
                         if(oldData == null)
                         {
                             logger.Info("PUT | Updation of student information with id=" + id + " not found!");
-                            return new CustomResponse<string, string>(Request, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
+                            return new CustomResponse<string>(Request, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
                         }
                         if (model.standardId != null && !ctx.Standards.AsEnumerable().Any(s => s.StandardId == model.standardId))
                         {
                             logger.Error("PUT | Updation of the student data with StandardId=" + model.standardId + " is violating the foreign key constraint!");
-                            return new CustomResponse<string, string>(Request, (int)ResultStatus.Failed, "StandardId=" + model.standardId + " is violating the constraints!");
+                            return new CustomResponse<string>(Request, (int)ResultStatus.Failed, "StandardId=" + model.standardId + " is violating the constraints!");
                         }
                         oldData.StudentName = model.Name;
                         oldData.StandardId = model.standardId;
                         ctx.SaveChanges();
                         logger.Info("PUT | Student details updated successfully for id=" + id);
-                        return new CustomResponse<string, string>(Request, (int)ResultStatus.Success, "Student details updated successfully!");
+                        return new CustomResponse<string>(Request, (int)ResultStatus.Success, "Student details updated successfully!");
                     }
                 }
                 catch(Exception ex)
                 {
                     logger.Error("PUT | " + ex.Message);
-                    return new CustomResponse<string, string>(Request, (int)ResultStatus.Failed, ex.Message, "");
+                    return new CustomResponse<string>(Request, (int)ResultStatus.Failed, ex.Message, "");
                 }
             }
             else
             {
                 logger.Error("PUT | Updation of student data violating the modal state!");
                 var errors = GetModelStateErrors(ModelState);
-                return new CustomResponse<string, List<string>>(Request, (int)ResultStatus.Failed, errors, "");
+                return new CustomResponse<string>(Request, (int)ResultStatus.Failed, errors);
             }
         }
         public IHttpActionResult Delete([FromUri] int id)
@@ -141,18 +141,18 @@ namespace SchoolWebAPI.Controllers
                     if (data == null)
                     {
                         logger.Error("DELETE | Can not delete student with id=" + id + " which does not exist.");
-                        return new CustomResponse<string, string>(Request, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
+                        return new CustomResponse<string>(Request, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
                     }
                     ctx.Students.Remove(ctx.Students.Where(s => s.StudentID == id).Select(s => s).First());
                     ctx.SaveChanges();
                     logger.Info("DELETE | Deleted student record with id=" + id);
-                    return new CustomResponse<string, string>(Request, (int)ResultStatus.Success, "Student with Id=" + id.ToString() + " has been removed successfully!");
+                    return new CustomResponse<string>(Request, (int)ResultStatus.Success, "Student with Id=" + id.ToString() + " has been removed successfully!");
                 }
             }
             catch (Exception ex)
             {
                 logger.Error("DELETE | " + ex.Message);
-                return new CustomResponse<string, string>(Request, (int)ResultStatus.Failed, ex.Message);
+                return new CustomResponse<string>(Request, (int)ResultStatus.Failed, ex.Message);
             }
         }
         

@@ -10,41 +10,59 @@ using System.Web.Http;
 
 namespace SchoolWebAPI.Utility
 {
-    public class CustomResponse<T1, T2> : IHttpActionResult
+    public class CustomDataWrapper<T>
     {
-        public T1 data { get; private set; }
-        private readonly int statusCode;
-        private readonly string messages;
+        public T Data { get; set; }
+        public int StatusCode { get; set; }
+        public List<string> messages { get; set; }
+    }
+
+    public class CustomResponse<T> : IHttpActionResult
+    {
+        public CustomDataWrapper<T> dataWrapper { get; set; }
         private readonly HttpRequestMessage request;
 
-        public CustomResponse(HttpRequestMessage requestMessage, int code, T2 msg, T1 _data = default)
+        public CustomResponse(HttpRequestMessage requestMessage, int code, string msg, T _data = default)
         {
-            data = _data;
-            statusCode = code;
-            switch(msg.GetType().ToString())
+            dataWrapper = new CustomDataWrapper<T>()
             {
-                case "System.String":
-                    messages = msg as string;
-                    break;
-                case "System.Collections.Generic.List`1[System.String]":
-                    messages = String.Join(", ", msg as List<string>);
-                    break;
-            }
+                Data = _data,
+                StatusCode = code,
+            };
+            dataWrapper.messages = new List<string>();
+            dataWrapper.messages.Add(msg);
+
+            #region Generic Type Logic for msg
+            //switch(msg.GetType().ToString())
+            //{
+            //    case "System.String":
+            //        dataWrapper.messages.AddRange();
+            //        break;
+            //    case "System.Collections.Generic.List`1[System.String]":
+            //        messages = String.Join(", ", msg as List<string>);
+            //        break;
+            //}
             //messages = string.Join(",", msg).ToString();
+            #endregion
+
+            request = requestMessage;
+        }
+
+        public CustomResponse(HttpRequestMessage requestMessage, int code, List<string> msgs, T _data = default)
+        {
+            dataWrapper = new CustomDataWrapper<T>()
+            {
+                Data = _data,
+                StatusCode = code,
+            };
+            dataWrapper.messages = new List<string>();
+            dataWrapper.messages.AddRange(msgs);
             request = requestMessage;
         }
 
         public Task<HttpResponseMessage> ExecuteAsync(CancellationToken cancellationToken)
         {
-            HttpResponseMessage response;
-            if(messages.Length > 0)
-            {
-                response = request.CreateResponse((HttpStatusCode)statusCode, messages);
-            }
-            else
-            {
-                response = request.CreateResponse((HttpStatusCode)statusCode, data);
-            }
+            HttpResponseMessage response = request.CreateResponse(HttpStatusCode.OK, dataWrapper);
             return Task.FromResult(response);
         }
     }
