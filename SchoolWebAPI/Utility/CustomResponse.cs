@@ -30,7 +30,7 @@ namespace SchoolWebAPI.Utility
                 StatusCode = code,
             };
             dataWrapper.messages = new List<string>();
-            dataWrapper.messages.Add(msg);
+            if(!string.IsNullOrEmpty(msg)) dataWrapper.messages.Add(msg);
 
             #region Generic Type Logic for msg
             //switch(msg.GetType().ToString())

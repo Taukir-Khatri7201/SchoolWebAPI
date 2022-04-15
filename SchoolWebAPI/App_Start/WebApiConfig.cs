@@ -13,7 +13,7 @@ namespace SchoolWebAPI
         {
             public CustomJsonFormatter()
             {
-                this.SupportedMediaTypes.Add(new System.Net.Http.Headers.MediaTypeHeaderValue("text/html"));
+                this.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
             }
 
             public override void SetDefaultContentHeaders(Type type, HttpContentHeaders headers, MediaTypeHeaderValue mediaType)

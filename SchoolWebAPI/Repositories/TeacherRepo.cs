@@ -1,49 +1,43 @@
 ﻿using SchoolWebAPI.Models;
-using SchoolWebAPI.Repositories;
+using SchoolWebAPI.Utility;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.ModelBinding;
 
-namespace SchoolWebAPI.Controllers
+namespace SchoolWebAPI.Repositories
 {
-    public class TeacherController : ApiController
+    public class TeacherRepo : ITeacherRepo
     {
-        private readonly ITeacherRepo teacherRepo;
+        private readonly ILogger logger;
+        private readonly ModalStateErrors modalStateErrors;
 
-        public TeacherController(ITeacherRepo teacherRepo)
+        public TeacherRepo(ILogger logger, ModalStateErrors modalStateErrors)
         {
-            this.teacherRepo = teacherRepo;
+            this.logger = logger;
+            this.modalStateErrors = modalStateErrors;
         }
 
-        [HttpGet]
-        public IHttpActionResult Get(int standardId = 0) => teacherRepo.Get(Request, standardId);
-        [HttpPost]
-        public IHttpActionResult Post([FromBody] TeacherViewModel model = default) => teacherRepo.Create(Request, ModelState, model);
-        [HttpPut]
-        public IHttpActionResult Put([FromUri] int id, [FromBody] TeacherViewModel model = default)
-                                    => teacherRepo.UpdateTeacher(Request, ModelState, id, model);
-        [HttpDelete]
-        public IHttpActionResult Delete([FromUri] int id) => teacherRepo.DeleteTeacher(Request, id);
-
-        /*
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
-        public IHttpActionResult Get(int standardId=0)
+        public IHttpActionResult Get(HttpRequestMessage request, int standardId = 0)
         {
             try
             {
                 IList<TeacherViewModel> list = new List<TeacherViewModel>();
-                using(var context = new SchoolDBEntities())
+                using (var context = new SchoolDBEntities())
                 {
-                    switch(standardId)
+                    switch (standardId)
                     {
-                        case 0: 
-                                list = context.Teachers.Select(t => new TeacherViewModel()
-                                {
-                                    TeacherId = t.TeacherId,
-                                    TeacherName = t.TeacherName,
-                                    TeacherType = (int)t.TeacherType,
-                                    StandardId = (int)t.StandardId,
-                                }).ToList();
-                                break;
+                        case 0:
+                            list = context.Teachers.Select(t => new TeacherViewModel()
+                            {
+                                TeacherId = t.TeacherId,
+                                TeacherName = t.TeacherName,
+                                TeacherType = (int)t.TeacherType,
+                                StandardId = (int)t.StandardId,
+                            }).ToList();
+                            break;
                         default:
                             list = context.Teachers.
                                 Where(t => t.StandardId == standardId).
@@ -54,10 +48,10 @@ namespace SchoolWebAPI.Controllers
                                     TeacherType = (int)t.TeacherType,
                                     StandardId = (int)t.StandardId,
                                 }).ToList();
-                                break;
+                            break;
 
                     }
-                    if(standardId == 0)
+                    if (standardId == 0)
                     {
                         logger.Info("GET | Requested for list of all teachers");
                     }
@@ -67,21 +61,20 @@ namespace SchoolWebAPI.Controllers
                     }
                     if (list.Count == 0)
                     {
-                        return new CustomResponse<string>(Request, (int)ResultStatus.Success, "No teacher records found!");
+                        return new CustomResponse<string>(request, (int)ResultStatus.Success, "No teacher records found!");
                     }
-                    return new CustomResponse<IList<TeacherViewModel>>(Request, (int)ResultStatus.Success, "", list);
+                    return new CustomResponse<IList<TeacherViewModel>>(request, (int)ResultStatus.Success, "", list);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("GET | " + ex.Message);
-                return new CustomResponse<string>(Request, (int)ResultStatus.Failed, ex.Message);
+                return new CustomResponse<string>(request, (int)ResultStatus.Failed, ex.Message);
             }
         }
-
-        public IHttpActionResult Post([FromBody] TeacherViewModel model)
+        public IHttpActionResult Create(HttpRequestMessage request, ModelStateDictionary modelState, TeacherViewModel model)
         {
-            if(ModelState.IsValid)
+            if (modelState.IsValid)
             {
                 try
                 {
@@ -90,7 +83,7 @@ namespace SchoolWebAPI.Controllers
                         if (model.StandardId != null && !ctx.Standards.AsEnumerable().Any(s => s.StandardId == model.StandardId))
                         {
                             logger.Error("POST | Addition of the teacher data with StandardId=" + model.StandardId + " is violating the foreign key constraint!");
-                            return new CustomResponse<string>(Request, (int)ResultStatus.Failed, "StandardId=" + model.StandardId + " is violating the constraints!");
+                            return new CustomResponse<string>(request, (int)ResultStatus.Failed, "StandardId=" + model.StandardId + " is violating the constraints!");
                         }
                         ctx.Teachers.Add(new Teacher
                         {
@@ -100,26 +93,25 @@ namespace SchoolWebAPI.Controllers
                         });
                         ctx.SaveChanges();
                         logger.Info("POST | New teacher data added!");
-                        return new CustomResponse<string>(Request, (int)ResultStatus.Success, "Teacher details inserted successfully!");
+                        return new CustomResponse<string>(request, (int)ResultStatus.Success, "Teacher details inserted successfully!");
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     logger.Error("Post | " + ex.Message);
-                    return new CustomResponse<string>(Request, (int)ResultStatus.Failed, ex.Message);
+                    return new CustomResponse<string>(request, (int)ResultStatus.Failed, ex.Message);
                 }
             }
             else
             {
                 logger.Error("POST | Addition of teacher data violating the modal state!");
-                var errors = GetModelStateErrors(ModelState);
-                return new CustomResponse<string>(Request, (int)ResultStatus.Failed, errors, "");
+                var errors = modalStateErrors.GetModelStateErrors(modelState);
+                return new CustomResponse<string>(request, (int)ResultStatus.Failed, errors, "");
             }
         }
-
-        public IHttpActionResult Put([FromUri] int id, [FromBody] TeacherViewModel model)
+        public IHttpActionResult UpdateTeacher(HttpRequestMessage request, ModelStateDictionary modelState, int id, TeacherViewModel model)
         {
-            if (ModelState.IsValid)
+            if (modelState.IsValid)
             {
                 try
                 {
@@ -129,36 +121,35 @@ namespace SchoolWebAPI.Controllers
                         if (oldData == null)
                         {
                             logger.Info("PUT | Updation of teacher information with id=" + id + " not found!");
-                            return new CustomResponse<string>(Request, (int)ResultStatus.NotFound, "Teacher with Id=" + id.ToString() + " not found!");
+                            return new CustomResponse<string>(request, (int)ResultStatus.NotFound, "Teacher with Id=" + id.ToString() + " not found!");
                         }
                         if (model.StandardId != null && !ctx.Standards.AsEnumerable().Any(s => s.StandardId == model.StandardId))
                         {
                             logger.Error("PUT | Updation of the teacher data with StandardId=" + model.StandardId + " is violating the foreign key constraint!");
-                            return new CustomResponse<string>(Request, (int)ResultStatus.Failed, "StandardId=" + model.StandardId + " is violating the constraints!");
+                            return new CustomResponse<string>(request, (int)ResultStatus.Failed, "StandardId=" + model.StandardId + " is violating the constraints!");
                         }
                         oldData.TeacherName = model.TeacherName;
                         oldData.StandardId = model.StandardId;
                         oldData.TeacherType = model.TeacherType;
                         ctx.SaveChanges();
                         logger.Info("PUT | Teacher details updated successfully for id=" + id);
-                        return new CustomResponse<string>(Request, (int)ResultStatus.Success, "Teacher details updated successfully!");
+                        return new CustomResponse<string>(request, (int)ResultStatus.Success, "Teacher details updated successfully!");
                     }
                 }
                 catch (Exception ex)
                 {
                     logger.Error("PUT | " + ex.Message);
-                    return new CustomResponse<string>(Request, (int)ResultStatus.Failed, ex.Message, "");
+                    return new CustomResponse<string>(request, (int)ResultStatus.Failed, ex.Message, "");
                 }
             }
             else
             {
                 logger.Error("PUT | Updation of teacher data violating the modal state!");
-                var errors = GetModelStateErrors(ModelState);
-                return new CustomResponse<string>(Request, (int)ResultStatus.Failed, errors);
+                var errors = modalStateErrors.GetModelStateErrors(modelState);
+                return new CustomResponse<string>(request, (int)ResultStatus.Failed, errors);
             }
         }
-
-        public IHttpActionResult Delete([FromUri] int id)
+        public IHttpActionResult DeleteTeacher(HttpRequestMessage request, int id)
         {
             try
             {
@@ -168,35 +159,19 @@ namespace SchoolWebAPI.Controllers
                     if (data == null)
                     {
                         logger.Error("DELETE | Can not delete teacher with id=" + id + " which does not exist.");
-                        return new CustomResponse<string>(Request, (int)ResultStatus.NotFound, "Teacher with Id=" + id.ToString() + " not found!");
+                        return new CustomResponse<string>(request, (int)ResultStatus.NotFound, "Teacher with Id=" + id.ToString() + " not found!");
                     }
                     ctx.Teachers.Remove(data);
                     ctx.SaveChanges();
                     logger.Info("DELETE | Deleted teacher record with id=" + id);
-                    return new CustomResponse<string>(Request, (int)ResultStatus.Success, "Teacher with Id=" + id.ToString() + " has been removed successfully!");
+                    return new CustomResponse<string>(request, (int)ResultStatus.Success, "Teacher with Id=" + id.ToString() + " has been removed successfully!");
                 }
             }
             catch (Exception ex)
             {
                 logger.Error("DELETE | " + ex.Message);
-                return new CustomResponse<string>(Request, (int)ResultStatus.Failed, ex.Message);
+                return new CustomResponse<string>(request, (int)ResultStatus.Failed, ex.Message);
             }
         }
-
-
-        [NonAction]
-        public List<string> GetModelStateErrors(ModelStateDictionary modelState)
-        {
-            var errors = new List<string>();
-            foreach (var state in modelState)
-            {
-                foreach (var error in state.Value.Errors)
-                {
-                    errors.Add(error.ErrorMessage);
-                }
-            }
-            return errors;
-        }
-        */
     }
 }

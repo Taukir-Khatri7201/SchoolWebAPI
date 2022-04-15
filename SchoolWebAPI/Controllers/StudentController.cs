@@ -1,18 +1,43 @@
 ﻿using SchoolWebAPI.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.ModelBinding;
-using NLog;
-using SchoolWebAPI.Utility;
+using SchoolWebAPI.Repositories;
 
 namespace SchoolWebAPI.Controllers
 {
+    [RoutePrefix("api/student")]
     public class StudentController : ApiController
     {
+        private readonly IStudentRepo studentRepo;
+
+        public StudentController(IStudentRepo studentRepo)
+        {
+            this.studentRepo = studentRepo;
+        }
+
+        [HttpGet]
+        public IHttpActionResult AllStudentsDetail() => studentRepo.GetAll(Request);
+
+        [HttpGet]
+        [Route("~/api/getStudentWithId/{id:int}")]
+        public IHttpActionResult Get(int id) => studentRepo.GetStudent(Request, id);
+
+        [HttpGet]
+        [Route("standard/{id:int}")]
+        public IHttpActionResult GetStudentsInStandard(int id) => studentRepo.GetStudentsByStandard(Request, id);
+
+        [HttpPost]
+        public IHttpActionResult Post([FromBody] StudentViewModel model) => studentRepo.Create(Request, ModelState, model);
+
+        [HttpPut]
+        [Route("{id}/update")]
+        public IHttpActionResult Put([FromUri] int id, [FromBody] StudentViewModel model) => studentRepo.UpdateStudent(Request, ModelState, id, model);
+
+        [HttpDelete]
+        [Route("{id}/remove")]
+        public IHttpActionResult Delete([FromUri] int id) => studentRepo.DeleteStudent(Request, id);
+
+        /*
+        
         private static Logger logger = LogManager.GetCurrentClassLogger();
         //[HttpGet]
         public IHttpActionResult Get()
@@ -62,7 +87,8 @@ namespace SchoolWebAPI.Controllers
             logger.Info("GET | Requested the information of student with id=" + id);
             return new CustomResponse<StudentViewModel>(Request, (int)ResultStatus.Success, "", student);
         }
-
+  
+        
         public IHttpActionResult Post([FromBody] StudentViewModel model)
         {
             if(ModelState.IsValid)
@@ -91,7 +117,7 @@ namespace SchoolWebAPI.Controllers
                 return new CustomResponse<string>(Request, (int)ResultStatus.Failed, errors);
             }
         }
-
+        
         public IHttpActionResult Put([FromUri] int id, [FromBody] StudentViewModel model)
         {
             if(ModelState.IsValid)
@@ -158,17 +184,9 @@ namespace SchoolWebAPI.Controllers
         
         [NonAction]
         public List<string> GetModelStateErrors(ModelStateDictionary modelState)
-        {
-            var errors = new List<string>();
-            foreach (var state in modelState)
-            {
-                foreach (var error in state.Value.Errors)
-                {
-                    errors.Add(error.ErrorMessage);
-                }
-            }
-            return errors;
-        }
+
+         */
+
     }
 
     public enum ResultStatus
