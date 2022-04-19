@@ -32,19 +32,6 @@ namespace SchoolWebAPI.Utility
             dataWrapper.messages = new List<string>();
             if(!string.IsNullOrEmpty(msg)) dataWrapper.messages.Add(msg);
 
-            #region Generic Type Logic for msg
-            //switch(msg.GetType().ToString())
-            //{
-            //    case "System.String":
-            //        dataWrapper.messages.AddRange();
-            //        break;
-            //    case "System.Collections.Generic.List`1[System.String]":
-            //        messages = String.Join(", ", msg as List<string>);
-            //        break;
-            //}
-            //messages = string.Join(",", msg).ToString();
-            #endregion
-
             request = requestMessage;
         }
 

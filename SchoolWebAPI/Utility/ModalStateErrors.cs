@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Http.ModelBinding;
 
 namespace SchoolWebAPI.Utility
@@ -22,6 +23,11 @@ namespace SchoolWebAPI.Utility
                 }
             }
             return Errors;
+        }
+
+        internal object GetModelStateErrors(object modalState)
+        {
+            throw new NotImplementedException();
         }
     }
 }

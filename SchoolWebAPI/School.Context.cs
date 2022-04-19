@@ -31,6 +31,7 @@ namespace SchoolWebAPI
         public virtual DbSet<Standard> Standards { get; set; }
         public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<StudentAddress> StudentAddresses { get; set; }
+        public virtual DbSet<StudentDocument> StudentDocuments { get; set; }
         public virtual DbSet<Teacher> Teachers { get; set; }
         public virtual DbSet<View_StudentCourse> View_StudentCourse { get; set; }
     

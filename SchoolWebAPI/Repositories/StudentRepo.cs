@@ -2,10 +2,15 @@
 using SchoolWebAPI.Utility;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using System.Web.Mvc;
 
 namespace SchoolWebAPI.Repositories
 {
@@ -91,7 +96,7 @@ namespace SchoolWebAPI.Repositories
             return new CustomResponse<List<StudentViewModel>>(request, (int)ResultStatus.Success, "", student);
         }
 
-        public IHttpActionResult Create(HttpRequestMessage request, ModelStateDictionary modelState, StudentViewModel model)
+        public IHttpActionResult Create(HttpRequestMessage request, System.Web.Http.ModelBinding.ModelStateDictionary modelState, StudentViewModel model)
         {
             if (modelState.IsValid)
             {
@@ -120,9 +125,9 @@ namespace SchoolWebAPI.Repositories
             }
         }
 
-        public IHttpActionResult UpdateStudent(HttpRequestMessage request, ModelStateDictionary modalState, int id, StudentViewModel model)
+        public IHttpActionResult UpdateStudent(HttpRequestMessage request, System.Web.Http.ModelBinding.ModelStateDictionary modelState, int id, StudentViewModel model)
         {
-            if (modalState.IsValid)
+            if (modelState.IsValid)
             {
                 try
                 {
@@ -155,7 +160,7 @@ namespace SchoolWebAPI.Repositories
             else
             {
                 logger.Error("PUT | Updation of student data violating the modal state!");
-                var errors = modalStateErrors.GetModelStateErrors(modalState);
+                var errors = modalStateErrors.GetModelStateErrors(modelState);
                 return new CustomResponse<string>(request, (int)ResultStatus.Failed, errors);
             }
         }
@@ -185,6 +190,100 @@ namespace SchoolWebAPI.Repositories
             }
         }
 
+        public IHttpActionResult UploadDocument(HttpRequest request, HttpRequestMessage requestMessage, System.Web.Http.ModelBinding.ModelStateDictionary modelState, int id)
+        {
+            try
+            {
+                if (request.Files.Count > 0)
+                {
+                    var fileName = request.Files[0].FileName;
+                    var file = request.Files[0];
+                    var AllowedExtensions = new string[] { "application/pdf", "text/plain" };
+
+                    if (AllowedExtensions.Contains(file.ContentType))
+                    {
+                        var MAX_LENGTH = 1000 * 1000 * 10;
+                        if (file.ContentLength > MAX_LENGTH)
+                        {
+                            return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, "The size of file must be less than 10MB");
+                        }
+                        var byteData = new byte[file.ContentLength];
+                        file.InputStream.Read(byteData, 0, file.ContentLength);
+                        using (var ctx = new SchoolDBEntities())
+                        {
+                            if (!ctx.Students.AsEnumerable().Any(s => s.StudentID == id))
+                            {
+                                logger.Error(String.Format("POST | No student exists with StudentId={0}", id));
+                                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, String.Format("No student exists with StudentId={0}!", id));
+                            }
+
+                            ctx.StudentDocuments.Add(new StudentDocument()
+                            {
+                                StudentId = id,
+                                FileName = fileName,
+                                FileContent = byteData,
+                            });
+                            ctx.SaveChanges();
+                        }
+                        return new CustomResponse<string>(requestMessage, (int)ResultStatus.Success, "Student Document Uploaded Successfully!");
+                    }
+                    return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, "Please upload text or pdf file only!");
+                }
+                else
+                {
+                    return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, "Please upload a file!");
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Error("UPLOAD | " + ex.Message);
+                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, ex.Message);
+            }
+        }
+    
+        public HttpResponseMessage DownloadDocument(HttpRequestMessage request, int id)
+        {
+            try
+            {
+                using (var ctx = new SchoolDBEntities())
+                {
+                    var available = ctx.StudentDocuments.Where(s => s.StudentId == id).FirstOrDefault();
+                    if (available == null)
+                    {
+                        string responseStr = String.Format("No document exists for student with StudentId={0}", id);
+                        logger.Error("GET | " + responseStr);
+                        var responseObj = new CustomDataWrapper<string>()
+                        {
+                            Data = null,
+                            StatusCode = (int)ResultStatus.Failed,
+                            messages = new List<string>() { responseStr + "!" },
+                        };
+                        return request.CreateResponse(HttpStatusCode.OK, responseObj);
+                    }
+                    var fileName = available.FileName;
+                    var fileContent = available.FileContent;
+                    var response = request.CreateResponse(HttpStatusCode.OK);
+                    response.Content = new ByteArrayContent(fileContent);
+                    response.Content.Headers.ContentLength = fileContent.Length;
+                    response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
+                    response.Content.Headers.ContentDisposition.FileName = fileName;
+                    response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(MimeMapping.GetMimeMapping(fileName));
+                    logger.Info("GET | " + String.Format("Requested the document for student with StudentId={0}", id));
+                    return response;
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.Error("DOWNLOAD | " + ex.Message);
+                var responseObj = new CustomDataWrapper<string>()
+                {
+                    Data = null,
+                    StatusCode = (int)ResultStatus.Failed,
+                    messages = new List<string>() { ex.Message },
+                };
+                return request.CreateResponse(HttpStatusCode.OK, responseObj);
+            }
+        }
     }
 
     public enum ResultStatus

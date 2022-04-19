@@ -198,6 +198,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AddressViewModel.cs" />
+    <Compile Include="Models\FileUploadViewModel.cs" />
     <Compile Include="Models\StandardViewModel.cs" />
     <Compile Include="Models\StudentViewModel.cs" />
     <Compile Include="Models\TeacherViewModel.cs" />
@@ -232,10 +233,14 @@
     <Compile Include="StudentAddress.cs">
       <DependentUpon>School.tt</DependentUpon>
     </Compile>
+    <Compile Include="StudentDocument.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
     <Compile Include="Teacher.cs">
       <DependentUpon>School.tt</DependentUpon>
     </Compile>
     <Compile Include="Utility\CustomResponse.cs" />
+    <Compile Include="Utility\FileValidationAttribute.cs" />
     <Compile Include="Utility\ModalStateErrors.cs" />
     <Compile Include="View_StudentCourse.cs">
       <DependentUpon>School.tt</DependentUpon>
@@ -252,8 +257,8 @@
     <Content Include="Global.asax" />
     <Content Include="School.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>School.Context.cs</LastGenOutput>
       <DependentUpon>School.edmx</DependentUpon>
+      <LastGenOutput>School.Context.cs</LastGenOutput>
     </Content>
     <Content Include="School.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

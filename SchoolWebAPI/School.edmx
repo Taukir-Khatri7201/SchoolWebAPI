@@ -49,6 +49,15 @@
           <Property Name="StudentId" Type="int" Nullable="false" />
           <Property Name="CourseId" Type="int" Nullable="false" />
         </EntityType>
+        <EntityType Name="StudentDocuments">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StudentId" Type="int" />
+          <Property Name="FileName" Type="text" Nullable="false" />
+          <Property Name="FileContent" Type="varbinary(max)" Nullable="false" />
+        </EntityType>
         <EntityType Name="Teacher">
           <Key>
             <PropertyRef Name="TeacherId" />
@@ -70,6 +79,18 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
           <Property Name="CourseId" Type="int" Nullable="false" />
           <Property Name="CourseName" Type="varchar" MaxLength="50" />
         </EntityType>
+        <Association Name="FK__StudentDo__Stude__5CD6CB2B">
+          <End Role="Student" Type="Self.Student" Multiplicity="0..1" />
+          <End Role="StudentDocuments" Type="Self.StudentDocuments" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentID" />
+            </Principal>
+            <Dependent Role="StudentDocuments">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Course_Teacher">
           <End Role="Teacher" Type="Self.Teacher" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
@@ -173,6 +194,7 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
           <EntitySet Name="Student" EntityType="Self.Student" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StudentAddress" EntityType="Self.StudentAddress" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StudentCourse" EntityType="Self.StudentCourse" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StudentDocuments" EntityType="Self.StudentDocuments" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Teacher" EntityType="Self.Teacher" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="View_StudentCourse" EntityType="Self.View_StudentCourse" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -182,6 +204,10 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
     [View_StudentCourse].[CourseName] AS [CourseName]
     FROM [dbo].[View_StudentCourse] AS [View_StudentCourse]</DefiningQuery>
           </EntitySet>
+          <AssociationSet Name="FK__StudentDo__Stude__5CD6CB2B" Association="Self.FK__StudentDo__Stude__5CD6CB2B">
+            <End Role="Student" EntitySet="Student" />
+            <End Role="StudentDocuments" EntitySet="StudentDocuments" />
+          </AssociationSet>
           <AssociationSet Name="FK_Course_Teacher" Association="Self.FK_Course_Teacher">
             <End Role="Teacher" EntitySet="Teacher" />
             <End Role="Course" EntitySet="Course" />
@@ -242,6 +268,7 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
           <Property Name="StandardId" Type="Int32" />
           <Property Name="RowVersion" Type="Binary" MaxLength="8" FixedLength="true" Nullable="false" annotation:StoreGeneratedPattern="Computed" />
           <NavigationProperty Name="Standard" Relationship="Self.FK_Student_Standard" FromRole="Student" ToRole="Standard" />
+          <NavigationProperty Name="StudentDocuments" Relationship="Self.FK__StudentDo__Stude__5CD6CB2B" FromRole="Student" ToRole="StudentDocuments" />
           <NavigationProperty Name="StudentAddress" Relationship="Self.FK_StudentAddress_Student" FromRole="Student" ToRole="StudentAddress" />
           <NavigationProperty Name="Courses" Relationship="Self.StudentCourse" FromRole="Student" ToRole="Course" />
         </EntityType>
@@ -255,6 +282,16 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
           <Property Name="City" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="State" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="Student" Relationship="Self.FK_StudentAddress_Student" FromRole="StudentAddress" ToRole="Student" />
+        </EntityType>
+        <EntityType Name="StudentDocument">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StudentId" Type="Int32" />
+          <Property Name="FileName" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="FileContent" Type="Binary" MaxLength="Max" FixedLength="false" Nullable="false" />
+          <NavigationProperty Name="Student" Relationship="Self.FK__StudentDo__Stude__5CD6CB2B" FromRole="StudentDocuments" ToRole="Student" />
         </EntityType>
         <EntityType Name="Teacher">
           <Key>
@@ -319,6 +356,18 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK__StudentDo__Stude__5CD6CB2B">
+          <End Role="Student" Type="Self.Student" Multiplicity="0..1" />
+          <End Role="StudentDocuments" Type="Self.StudentDocument" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentID" />
+            </Principal>
+            <Dependent Role="StudentDocuments">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_StudentAddress_Student">
           <End Role="Student" Type="Self.Student" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -342,6 +391,7 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
           <EntitySet Name="Standards" EntityType="Self.Standard" />
           <EntitySet Name="Students" EntityType="Self.Student" />
           <EntitySet Name="StudentAddresses" EntityType="Self.StudentAddress" />
+          <EntitySet Name="StudentDocuments" EntityType="Self.StudentDocument" />
           <EntitySet Name="Teachers" EntityType="Self.Teacher" />
           <EntitySet Name="View_StudentCourse" EntityType="Self.View_StudentCourse" />
           <AssociationSet Name="FK_Course_Teacher" Association="Self.FK_Course_Teacher">
@@ -355,6 +405,10 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
           <AssociationSet Name="FK_Teacher_Standard" Association="Self.FK_Teacher_Standard">
             <End Role="Standard" EntitySet="Standards" />
             <End Role="Teacher" EntitySet="Teachers" />
+          </AssociationSet>
+          <AssociationSet Name="FK__StudentDo__Stude__5CD6CB2B" Association="Self.FK__StudentDo__Stude__5CD6CB2B">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="StudentDocuments" EntitySet="StudentDocuments" />
           </AssociationSet>
           <AssociationSet Name="FK_StudentAddress_Student" Association="Self.FK_StudentAddress_Student">
             <End Role="Student" EntitySet="Students" />
@@ -428,6 +482,16 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
                 <ScalarProperty Name="Address2" ColumnName="Address2" />
                 <ScalarProperty Name="City" ColumnName="City" />
                 <ScalarProperty Name="State" ColumnName="State" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StudentDocuments">
+            <EntityTypeMapping TypeName="SchoolDBModel.StudentDocument">
+              <MappingFragment StoreEntitySet="StudentDocuments">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
+                <ScalarProperty Name="FileName" ColumnName="FileName" />
+                <ScalarProperty Name="FileContent" ColumnName="FileContent" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
