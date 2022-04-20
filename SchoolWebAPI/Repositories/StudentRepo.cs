@@ -6,11 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
-using System.Web.Mvc;
 
 namespace SchoolWebAPI.Repositories
 {
@@ -18,17 +16,20 @@ namespace SchoolWebAPI.Repositories
     {
         private readonly ILogger logger;
         private readonly ModalStateErrors modalStateErrors;
+        private readonly HttpRequest request;
+        private readonly HttpRequestMessage requestMessage;
 
         public StudentRepo(ILogger logger, ModalStateErrors modalStateErrors)
         {
             this.logger = logger;
             this.modalStateErrors = modalStateErrors;
+            request = HttpContext.Current.Request;
+            requestMessage = HttpContext.Current.Items["MS_HttpRequestMessage"] as HttpRequestMessage;
         }
 
-        public IHttpActionResult GetAll(HttpRequestMessage request)
+        public IHttpActionResult GetAll()
         {
             IList<StudentViewModel> students = null;
-
             using (var ctx = new SchoolDBEntities())
             {
                 students = ctx.Students
@@ -42,13 +43,13 @@ namespace SchoolWebAPI.Repositories
             logger.Info("GET | Requested for the list of all students");
             if (students.Count == 0)
             {
-                return new CustomResponse<string>(request, (int)ResultStatus.Success, "No student Records found!");
+                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Success, "No student Records found!");
             }
 
-            return new CustomResponse<IList<StudentViewModel>>(request, (int)ResultStatus.Success, "", students);
+            return new CustomResponse<IList<StudentViewModel>>(requestMessage, (int)ResultStatus.Success, "", students);
         }
 
-        public IHttpActionResult GetStudent(HttpRequestMessage request, int id)
+        public IHttpActionResult GetStudent(int id)
         {
             StudentViewModel student = null;
 
@@ -66,13 +67,13 @@ namespace SchoolWebAPI.Repositories
             if (student == null)
             {
                 logger.Info("GET | Requested information of student with id=" + id + " not found!");
-                return new CustomResponse<string>(request, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
+                return new CustomResponse<string>(requestMessage, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
             }
             logger.Info("GET | Requested the information of student with id=" + id);
-            return new CustomResponse<StudentViewModel>(request, (int)ResultStatus.Success, "", student);
+            return new CustomResponse<StudentViewModel>(requestMessage, (int)ResultStatus.Success, "", student);
         }
         
-        public IHttpActionResult GetStudentsByStandard(HttpRequestMessage request, int id)
+        public IHttpActionResult GetStudentsByStandard(int id)
         {
             List<StudentViewModel> student = null;
 
@@ -90,13 +91,13 @@ namespace SchoolWebAPI.Repositories
             if (student == null)
             {
                 logger.Info("GET | Requested information of student who are in standard " + id + " not found!");
-                return new CustomResponse<string>(request, (int)ResultStatus.NotFound, "No students are there in standard " + id);
+                return new CustomResponse<string>(requestMessage, (int)ResultStatus.NotFound, "No students are there in standard " + id);
             }
             logger.Info("GET | Requested the information of student who are in standard " + id);
-            return new CustomResponse<List<StudentViewModel>>(request, (int)ResultStatus.Success, "", student);
+            return new CustomResponse<List<StudentViewModel>>(requestMessage, (int)ResultStatus.Success, "", student);
         }
 
-        public IHttpActionResult Create(HttpRequestMessage request, System.Web.Http.ModelBinding.ModelStateDictionary modelState, StudentViewModel model)
+        public IHttpActionResult Create(ModelStateDictionary modelState, StudentViewModel model)
         {
             if (modelState.IsValid)
             {
@@ -105,7 +106,7 @@ namespace SchoolWebAPI.Repositories
                     if (model.standardId != null && !ctx.Standards.AsEnumerable().Any(s => s.StandardId == model.standardId))
                     {
                         logger.Error("POST | Addition of the student data with StandardId=" + model.standardId + " is violating the foreign key constraint!");
-                        return new CustomResponse<string>(request, (int)ResultStatus.Failed, "StandardId=" + model.standardId + " is violating the constraints!");
+                        return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, "StandardId=" + model.standardId + " is violating the constraints!");
                     }
                     ctx.Students.Add(new Student
                     {
@@ -114,18 +115,18 @@ namespace SchoolWebAPI.Repositories
                     });
                     ctx.SaveChanges();
                     logger.Info("POST | New student data added");
-                    return new CustomResponse<string>(request, (int)ResultStatus.Success, "Student details inserted successfully!");
+                    return new CustomResponse<string>(requestMessage, (int)ResultStatus.Success, "Student details inserted successfully!");
                 }
             }
             else
             {
                 var errors = modalStateErrors.GetModelStateErrors(modelState);
                 logger.Error("POST | Addition of the student data violating the modal state!");
-                return new CustomResponse<string>(request, (int)ResultStatus.Failed, errors);
+                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, errors);
             }
         }
 
-        public IHttpActionResult UpdateStudent(HttpRequestMessage request, System.Web.Http.ModelBinding.ModelStateDictionary modelState, int id, StudentViewModel model)
+        public IHttpActionResult UpdateStudent(ModelStateDictionary modelState, int id, StudentViewModel model)
         {
             if (modelState.IsValid)
             {
@@ -137,35 +138,35 @@ namespace SchoolWebAPI.Repositories
                         if (oldData == null)
                         {
                             logger.Info("PUT | Updation of student information with id=" + id + " not found!");
-                            return new CustomResponse<string>(request, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
+                            return new CustomResponse<string>(requestMessage, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
                         }
                         if (model.standardId != null && !ctx.Standards.AsEnumerable().Any(s => s.StandardId == model.standardId))
                         {
                             logger.Error("PUT | Updation of the student data with StandardId=" + model.standardId + " is violating the foreign key constraint!");
-                            return new CustomResponse<string>(request, (int)ResultStatus.Failed, "StandardId=" + model.standardId + " is violating the constraints!");
+                            return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, "StandardId=" + model.standardId + " is violating the constraints!");
                         }
                         oldData.StudentName = model.Name;
                         oldData.StandardId = model.standardId;
                         ctx.SaveChanges();
                         logger.Info("PUT | Student details updated successfully for id=" + id);
-                        return new CustomResponse<string>(request, (int)ResultStatus.Success, "Student details updated successfully!");
+                        return new CustomResponse<string>(requestMessage, (int)ResultStatus.Success, "Student details updated successfully!");
                     }
                 }
                 catch (Exception ex)
                 {
                     logger.Error("PUT | " + ex.Message);
-                    return new CustomResponse<string>(request, (int)ResultStatus.Failed, ex.Message, "");
+                    return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, ex.Message, "");
                 }
             }
             else
             {
                 logger.Error("PUT | Updation of student data violating the modal state!");
                 var errors = modalStateErrors.GetModelStateErrors(modelState);
-                return new CustomResponse<string>(request, (int)ResultStatus.Failed, errors);
+                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, errors);
             }
         }
 
-        public IHttpActionResult DeleteStudent(HttpRequestMessage request, int id)
+        public IHttpActionResult DeleteStudent(int id)
         {
             try
             {
@@ -175,22 +176,93 @@ namespace SchoolWebAPI.Repositories
                     if (data == null)
                     {
                         logger.Error("DELETE | Can not delete student with id=" + id + " which does not exist.");
-                        return new CustomResponse<string>(request, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
+                        return new CustomResponse<string>(requestMessage, (int)ResultStatus.NotFound, "Student with Id=" + id.ToString() + " not found!");
                     }
                     ctx.Students.Remove(ctx.Students.Where(s => s.StudentID == id).Select(s => s).First());
                     ctx.SaveChanges();
                     logger.Info("DELETE | Deleted student record with id=" + id);
-                    return new CustomResponse<string>(request, (int)ResultStatus.Success, "Student with Id=" + id.ToString() + " has been removed successfully!");
+                    return new CustomResponse<string>(requestMessage, (int)ResultStatus.Success, "Student with Id=" + id.ToString() + " has been removed successfully!");
                 }
             }
             catch (Exception ex)
             {
                 logger.Error("DELETE | " + ex.Message);
-                return new CustomResponse<string>(request, (int)ResultStatus.Failed, ex.Message);
+                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, ex.Message);
             }
         }
 
-        public IHttpActionResult UploadDocument(HttpRequest request, HttpRequestMessage requestMessage, System.Web.Http.ModelBinding.ModelStateDictionary modelState, int id)
+        /// <summary>
+        /// Save Uploaded File Content Directly in Database
+        /// </summary>
+        /// <param name="id">StudentId</param>
+        /// <returns></returns>
+        //public IHttpActionResult UploadDocument(int id)
+        //{
+        //    try
+        //    {
+        //        if (request.Files.Count > 0)
+        //        {
+        //            var fileName = request.Files[0].FileName;
+        //            var file = request.Files[0];
+        //            var AllowedExtensions = new string[] { "application/pdf", "text/plain" };
+
+        //            if (AllowedExtensions.Contains(file.ContentType))
+        //            {
+        //                var MAX_LENGTH = 1000 * 1000 * 10;
+        //                if (file.ContentLength > MAX_LENGTH)
+        //                {
+        //                    logger.Info(string.Format("UPLOAD | Uploaded a file with size greater than 10MB"));
+        //                    return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, "The size of file must be less than 10MB");
+        //                }
+        //                var byteData = new byte[file.ContentLength];
+        //                file.InputStream.Read(byteData, 0, file.ContentLength);
+        //                using (var ctx = new SchoolDBEntities())
+        //                {
+        //                    if (!ctx.Students.AsEnumerable().Any(s => s.StudentID == id))
+        //                    {
+        //                        logger.Info(string.Format("UPLOAD | No student exists with StudentId={0}", id));
+        //                        return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, string.Format("No student exists with StudentId={0}!", id));
+        //                    }
+        //                    if(ctx.StudentDocuments.Any(s => s.StudentId == id))
+        //                    {
+        //                        logger.Info(string.Format("UPLOAD | A try to overwrite student document for student with StudentId={0}", id));
+        //                        return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, string.Format("Student document already exists for student with StudentId={0}!", id));
+        //                    }
+        //                    ctx.StudentDocuments.Add(new StudentDocument()
+        //                    {
+        //                        StudentId = id,
+        //                        FileName = fileName,
+        //                        FileContent = byteData,
+        //                    });
+        //                    ctx.SaveChanges();
+        //                }
+        //                logger.Info(string.Format("UPLOAD | Document uploaded for student with StudentId={0}", id));
+        //                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Success, "Student Document Uploaded Successfully!");
+        //            }
+        //            logger.Info("UPLOAD | Wrong file uploaded");
+        //            return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, "Please upload text or pdf file only!");
+        //        }
+        //        else
+        //        {
+
+        //            logger.Error("UPLOAD | Wrong file uploaded");
+        //            return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, "Please upload a file!");
+        //        }
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        logger.Error("UPLOAD | " + ex.Message);
+        //        return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, ex.Message);
+        //    }
+        //}
+
+
+        /// <summary>
+        /// Save Uploaded File in StudentDocumentsDirectory
+        /// </summary>
+        /// <param name="id">StudentId</param>
+        /// <returns></returns>
+        public IHttpActionResult UploadDocument(int id)
         {
             try
             {
@@ -205,74 +277,144 @@ namespace SchoolWebAPI.Repositories
                         var MAX_LENGTH = 1000 * 1000 * 10;
                         if (file.ContentLength > MAX_LENGTH)
                         {
+                            logger.Info(string.Format("UPLOAD | Uploaded a file with size greater than 10MB"));
                             return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, "The size of file must be less than 10MB");
                         }
-                        var byteData = new byte[file.ContentLength];
-                        file.InputStream.Read(byteData, 0, file.ContentLength);
+                        string path = HttpContext.Current.Server.MapPath("~/StudentDocuments/");
+                        if (!Directory.Exists(path))
+                        {
+                            Directory.CreateDirectory(path);
+                        }
+                        string filePath = path + fileName;
+                        file.SaveAs(filePath);
+
                         using (var ctx = new SchoolDBEntities())
                         {
                             if (!ctx.Students.AsEnumerable().Any(s => s.StudentID == id))
                             {
-                                logger.Error(String.Format("POST | No student exists with StudentId={0}", id));
-                                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, String.Format("No student exists with StudentId={0}!", id));
+                                logger.Info(string.Format("UPLOAD | No student exists with StudentId={0}", id));
+                                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, string.Format("No student exists with StudentId={0}!", id));
                             }
-
-                            ctx.StudentDocuments.Add(new StudentDocument()
+                            if (ctx.StudentDocuments2.Any(s => s.StudentId == id))
+                            {
+                                logger.Info(string.Format("UPLOAD | A try to overwrite student document for student with StudentId={0}", id));
+                                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, string.Format("Student document already exists for student with StudentId={0}!", id));
+                            }
+                            ctx.StudentDocuments2.Add(new StudentDocuments2()
                             {
                                 StudentId = id,
                                 FileName = fileName,
-                                FileContent = byteData,
+                                FileContent = filePath,
                             });
                             ctx.SaveChanges();
                         }
+                        logger.Info(string.Format("UPLOAD | Document uploaded for student with StudentId={0}", id));
                         return new CustomResponse<string>(requestMessage, (int)ResultStatus.Success, "Student Document Uploaded Successfully!");
                     }
+                    logger.Info("UPLOAD | Wrong file uploaded");
                     return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, "Please upload text or pdf file only!");
                 }
                 else
                 {
+
+                    logger.Error("UPLOAD | Wrong file uploaded");
                     return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, "Please upload a file!");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("UPLOAD | " + ex.Message);
                 return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, ex.Message);
             }
         }
-    
-        public HttpResponseMessage DownloadDocument(HttpRequestMessage request, int id)
+
+        /// <summary>
+        /// Download Document From FileContent stored in Database in form of byte array
+        /// </summary>
+        /// <param name="id">StudentId</param>
+        /// <returns></returns>
+        //public HttpResponseMessage DownloadDocument(int id)
+        //{
+        //    try
+        //    {
+        //        using (var ctx = new SchoolDBEntities())
+        //        {
+        //            var available = ctx.StudentDocuments.Where(s => s.StudentId == id).FirstOrDefault();
+        //            if (available == null)
+        //            {
+        //                string responseStr = string.Format("No document exists for student with StudentId={0}", id);
+        //                logger.Info("DOWNLOAD | " + responseStr);
+        //                var responseObj = new CustomDataWrapper<string>()
+        //                {
+        //                    Data = null,
+        //                    StatusCode = (int)ResultStatus.Failed,
+        //                    messages = new List<string>() { responseStr + "!" },
+        //                };
+        //                return requestMessage.CreateResponse(HttpStatusCode.OK, responseObj);
+        //            }
+        //            var fileName = available.FileName;
+        //            var fileContent = available.FileContent;
+        //            var response = requestMessage.CreateResponse(HttpStatusCode.OK);
+        //            response.Content = new ByteArrayContent(fileContent);
+        //            response.Content.Headers.ContentLength = fileContent.Length;
+        //            response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
+        //            response.Content.Headers.ContentDisposition.FileName = fileName;
+        //            response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(MimeMapping.GetMimeMapping(fileName));
+        //            logger.Info("DOWNLOAD | " + string.Format("Requested the document for student with StudentId={0}", id));
+        //            return response;
+        //        }
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        logger.Error("DOWNLOAD | " + ex.Message);
+        //        var responseObj = new CustomDataWrapper<string>()
+        //        {
+        //            Data = null,
+        //            StatusCode = (int)ResultStatus.Failed,
+        //            messages = new List<string>() { ex.Message },
+        //        };
+        //        return requestMessage.CreateResponse(HttpStatusCode.OK, responseObj);
+        //    }
+        //}
+
+        /// <summary>
+        /// Download file using the file path stored in database table
+        /// </summary>
+        /// <param name="id">StudentId</param>
+        /// <returns></returns>
+        public HttpResponseMessage DownloadDocument(int id)
         {
             try
             {
                 using (var ctx = new SchoolDBEntities())
                 {
-                    var available = ctx.StudentDocuments.Where(s => s.StudentId == id).FirstOrDefault();
+                    var available = ctx.StudentDocuments2.Where(s => s.StudentId == id).FirstOrDefault();
                     if (available == null)
                     {
-                        string responseStr = String.Format("No document exists for student with StudentId={0}", id);
-                        logger.Error("GET | " + responseStr);
+                        string responseStr = string.Format("No document exists for student with StudentId={0}", id);
+                        logger.Info("DOWNLOAD | " + responseStr);
                         var responseObj = new CustomDataWrapper<string>()
                         {
                             Data = null,
                             StatusCode = (int)ResultStatus.Failed,
                             messages = new List<string>() { responseStr + "!" },
                         };
-                        return request.CreateResponse(HttpStatusCode.OK, responseObj);
+                        return requestMessage.CreateResponse(HttpStatusCode.OK, responseObj);
                     }
                     var fileName = available.FileName;
-                    var fileContent = available.FileContent;
-                    var response = request.CreateResponse(HttpStatusCode.OK);
+                    var filePath = available.FileContent;
+                    var fileContent = File.ReadAllBytes(filePath);
+                    var response = requestMessage.CreateResponse(HttpStatusCode.OK);
                     response.Content = new ByteArrayContent(fileContent);
                     response.Content.Headers.ContentLength = fileContent.Length;
                     response.Content.Headers.ContentDisposition = new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
                     response.Content.Headers.ContentDisposition.FileName = fileName;
                     response.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(MimeMapping.GetMimeMapping(fileName));
-                    logger.Info("GET | " + String.Format("Requested the document for student with StudentId={0}", id));
+                    logger.Info("DOWNLOAD | " + string.Format("Requested the document for student with StudentId={0}", id));
                     return response;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.Error("DOWNLOAD | " + ex.Message);
                 var responseObj = new CustomDataWrapper<string>()
@@ -281,7 +423,7 @@ namespace SchoolWebAPI.Repositories
                     StatusCode = (int)ResultStatus.Failed,
                     messages = new List<string>() { ex.Message },
                 };
-                return request.CreateResponse(HttpStatusCode.OK, responseObj);
+                return requestMessage.CreateResponse(HttpStatusCode.OK, responseObj);
             }
         }
     }

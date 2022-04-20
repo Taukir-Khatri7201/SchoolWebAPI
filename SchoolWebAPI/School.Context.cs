@@ -34,6 +34,7 @@ namespace SchoolWebAPI
         public virtual DbSet<StudentDocument> StudentDocuments { get; set; }
         public virtual DbSet<Teacher> Teachers { get; set; }
         public virtual DbSet<View_StudentCourse> View_StudentCourse { get; set; }
+        public virtual DbSet<StudentDocuments2> StudentDocuments2 { get; set; }
     
         public virtual ObjectResult<GetCoursesByStudentId_Result> GetCoursesByStudentId(Nullable<int> studentId)
         {

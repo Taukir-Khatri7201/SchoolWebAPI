@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="SchoolDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="SchoolDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Course">
           <Key>
             <PropertyRef Name="CourseId" />
@@ -58,6 +58,15 @@
           <Property Name="FileName" Type="text" Nullable="false" />
           <Property Name="FileContent" Type="varbinary(max)" Nullable="false" />
         </EntityType>
+        <EntityType Name="StudentDocuments2">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="StudentId" Type="int" />
+          <Property Name="FileName" Type="text" Nullable="false" />
+          <Property Name="FileContent" Type="text" Nullable="false" />
+        </EntityType>
         <EntityType Name="Teacher">
           <Key>
             <PropertyRef Name="TeacherId" />
@@ -87,6 +96,18 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
               <PropertyRef Name="StudentID" />
             </Principal>
             <Dependent Role="StudentDocuments">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__StudentDo__Stude__6FE99F9F">
+          <End Role="Student" Type="Self.Student" Multiplicity="0..1" />
+          <End Role="StudentDocuments2" Type="Self.StudentDocuments2" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentID" />
+            </Principal>
+            <Dependent Role="StudentDocuments2">
               <PropertyRef Name="StudentId" />
             </Dependent>
           </ReferentialConstraint>
@@ -195,6 +216,7 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
           <EntitySet Name="StudentAddress" EntityType="Self.StudentAddress" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StudentCourse" EntityType="Self.StudentCourse" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="StudentDocuments" EntityType="Self.StudentDocuments" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StudentDocuments2" EntityType="Self.StudentDocuments2" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Teacher" EntityType="Self.Teacher" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="View_StudentCourse" EntityType="Self.View_StudentCourse" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
@@ -207,6 +229,10 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
           <AssociationSet Name="FK__StudentDo__Stude__5CD6CB2B" Association="Self.FK__StudentDo__Stude__5CD6CB2B">
             <End Role="Student" EntitySet="Student" />
             <End Role="StudentDocuments" EntitySet="StudentDocuments" />
+          </AssociationSet>
+          <AssociationSet Name="FK__StudentDo__Stude__6FE99F9F" Association="Self.FK__StudentDo__Stude__6FE99F9F">
+            <End Role="Student" EntitySet="Student" />
+            <End Role="StudentDocuments2" EntitySet="StudentDocuments2" />
           </AssociationSet>
           <AssociationSet Name="FK_Course_Teacher" Association="Self.FK_Course_Teacher">
             <End Role="Teacher" EntitySet="Teacher" />
@@ -233,8 +259,7 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
             <End Role="Teacher" EntitySet="Teacher" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="SchoolDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -271,6 +296,7 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
           <NavigationProperty Name="StudentDocuments" Relationship="Self.FK__StudentDo__Stude__5CD6CB2B" FromRole="Student" ToRole="StudentDocuments" />
           <NavigationProperty Name="StudentAddress" Relationship="Self.FK_StudentAddress_Student" FromRole="Student" ToRole="StudentAddress" />
           <NavigationProperty Name="Courses" Relationship="Self.StudentCourse" FromRole="Student" ToRole="Course" />
+          <NavigationProperty Name="StudentDocuments2" Relationship="SchoolDBModel.FK__StudentDo__Stude__6FE99F9F" FromRole="Student" ToRole="StudentDocuments2" />
         </EntityType>
         <EntityType Name="StudentAddress">
           <Key>
@@ -419,10 +445,10 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
             <End Role="Student" EntitySet="Students" />
           </AssociationSet>
           <FunctionImport Name="GetCoursesByStudentId" ReturnType="Collection(SchoolDBModel.GetCoursesByStudentId_Result)">
-            <Parameter Name="StudentId" Mode="In" Type="Int32" />
+          <Parameter Name="StudentId" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="sp_DeleteStudent">
-            <Parameter Name="StudentId" Mode="In" Type="Int32" />
+          <Parameter Name="StudentId" Mode="In" Type="Int32" />
           </FunctionImport>
           <FunctionImport Name="sp_InsertStudentInfo" ReturnType="Collection(Decimal)">
             <Parameter Name="StandardId" Mode="In" Type="Int32" />
@@ -433,12 +459,39 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
             <Parameter Name="StandardId" Mode="In" Type="Int32" />
             <Parameter Name="StudentName" Mode="In" Type="String" />
           </FunctionImport>
+          <EntitySet Name="StudentDocuments2" EntityType="SchoolDBModel.StudentDocuments2" />
+          <AssociationSet Name="FK__StudentDo__Stude__6FE99F9F" Association="SchoolDBModel.FK__StudentDo__Stude__6FE99F9F">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="StudentDocuments2" EntitySet="StudentDocuments2" />
+          </AssociationSet>
         </EntityContainer>
         <ComplexType Name="GetCoursesByStudentId_Result">
           <Property Type="Int32" Name="courseid" Nullable="true" />
           <Property Type="String" Name="coursename" Nullable="true" MaxLength="50" />
           <Property Type="Int32" Name="TeacherId" Nullable="true" />
         </ComplexType>
+        <EntityType Name="StudentDocuments2">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="StudentId" Type="Int32" />
+          <Property Name="FileName" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="FileContent" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Student" Relationship="SchoolDBModel.FK__StudentDo__Stude__6FE99F9F" FromRole="StudentDocuments2" ToRole="Student" />
+        </EntityType>
+        <Association Name="FK__StudentDo__Stude__6FE99F9F">
+          <End Type="SchoolDBModel.Student" Role="Student" Multiplicity="0..1" />
+          <End Type="SchoolDBModel.StudentDocuments2" Role="StudentDocuments2" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentID" />
+            </Principal>
+            <Dependent Role="StudentDocuments2">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -535,6 +588,16 @@ warning 6002: The table/view 'SchoolDB.dbo.View_StudentCourse' does not have a p
           <FunctionImportMapping FunctionImportName="sp_DeleteStudent" FunctionName="SchoolDBModel.Store.sp_DeleteStudent" />
           <FunctionImportMapping FunctionImportName="sp_InsertStudentInfo" FunctionName="SchoolDBModel.Store.sp_InsertStudentInfo" />
           <FunctionImportMapping FunctionImportName="sp_UpdateStudent" FunctionName="SchoolDBModel.Store.sp_UpdateStudent" />
+          <EntitySetMapping Name="StudentDocuments2">
+            <EntityTypeMapping TypeName="SchoolDBModel.StudentDocuments2">
+              <MappingFragment StoreEntitySet="StudentDocuments2">
+                <ScalarProperty Name="FileContent" ColumnName="FileContent" />
+                <ScalarProperty Name="FileName" ColumnName="FileName" />
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

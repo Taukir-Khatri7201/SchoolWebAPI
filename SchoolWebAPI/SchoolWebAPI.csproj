@@ -236,6 +236,9 @@
     <Compile Include="StudentDocument.cs">
       <DependentUpon>School.tt</DependentUpon>
     </Compile>
+    <Compile Include="StudentDocuments2.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
     <Compile Include="Teacher.cs">
       <DependentUpon>School.tt</DependentUpon>
     </Compile>

@@ -19,6 +19,7 @@ namespace SchoolWebAPI
         {
             this.StudentDocuments = new HashSet<StudentDocument>();
             this.Courses = new HashSet<Course>();
+            this.StudentDocuments2 = new HashSet<StudentDocuments2>();
         }
     
         public int StudentID { get; set; }
@@ -32,5 +33,7 @@ namespace SchoolWebAPI
         public virtual StudentAddress StudentAddress { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Course> Courses { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<StudentDocuments2> StudentDocuments2 { get; set; }
     }
 }

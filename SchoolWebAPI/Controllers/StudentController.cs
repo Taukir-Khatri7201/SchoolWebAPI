@@ -19,31 +19,31 @@ namespace SchoolWebAPI.Controllers
 
         [HttpGet]
         [Route("~/api/student")]
-        public IHttpActionResult AllStudentsDetail() => studentRepo.GetAll(Request);
+        public IHttpActionResult AllStudentsDetail() => studentRepo.GetAll();
 
         [HttpGet]
         [Route("~/api/getStudentWithId/{id:int:min(1)}")]
-        public IHttpActionResult Get(int id) => studentRepo.GetStudent(Request, id);
+        public IHttpActionResult Get(int id) => studentRepo.GetStudent(id);
 
         [HttpPost]
         [Route(Name = "Create")]
-        public IHttpActionResult Post([FromBody] StudentViewModel model) => studentRepo.Create(Request, ModelState, model);
+        public IHttpActionResult Post([FromBody] StudentViewModel model) => studentRepo.Create(ModelState, model);
 
         [HttpPut]
         [Route("{id}/update")]
-        public IHttpActionResult Put([FromUri] int id, [FromBody] StudentViewModel model) => studentRepo.UpdateStudent(Request, ModelState, id, model);
+        public IHttpActionResult Put([FromUri] int id, [FromBody] StudentViewModel model) => studentRepo.UpdateStudent(ModelState, id, model);
 
         [HttpDelete]
         [Route("{id}/remove")]
-        public IHttpActionResult Delete([FromUri] int id) => studentRepo.DeleteStudent(Request, id);
+        public IHttpActionResult Delete([FromUri] int id) => studentRepo.DeleteStudent(id);
 
         [HttpPost]
         [Route("upload/{id:int}")]
-        public IHttpActionResult Upload([FromUri] int id) => studentRepo.UploadDocument(HttpContext.Current.Request, Request, ModelState, id);
+        public IHttpActionResult Upload([FromUri] int id) => studentRepo.UploadDocument(id);
 
         [HttpGet]
         [Route("download/{id:int}")]
-        public HttpResponseMessage Download([FromUri] int id) => studentRepo.DownloadDocument(Request, id);
+        public HttpResponseMessage Download([FromUri] int id) => studentRepo.DownloadDocument(id);
     }
 
     public enum ResultStatus
