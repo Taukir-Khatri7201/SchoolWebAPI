@@ -7,33 +7,26 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SchoolWebAPI
+namespace SchoolWebAPI.Models
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Student
+    public partial class Teacher
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Student()
+        public Teacher()
         {
-            this.StudentDocuments = new HashSet<StudentDocument>();
             this.Courses = new HashSet<Course>();
-            this.StudentDocuments2 = new HashSet<StudentDocuments2>();
         }
     
-        public int StudentID { get; set; }
-        public string StudentName { get; set; }
+        public int TeacherId { get; set; }
+        public string TeacherName { get; set; }
         public Nullable<int> StandardId { get; set; }
-        public byte[] RowVersion { get; set; }
+        public Nullable<int> TeacherType { get; set; }
     
-        public virtual Standard Standard { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<StudentDocument> StudentDocuments { get; set; }
-        public virtual StudentAddress StudentAddress { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Course> Courses { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<StudentDocuments2> StudentDocuments2 { get; set; }
+        public virtual Standard Standard { get; set; }
     }
 }

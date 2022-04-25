@@ -1,13 +1,16 @@
-﻿using SchoolWebAPI.Models;
+﻿using SchoolWebAPI.ViewModels;
 using System.Web.Http;
 using SchoolWebAPI.Repositories;
 using System.Web;
 using System.Net.Http;
 using System.Net;
+using SchoolWebAPI.Filters;
+using System.ComponentModel.DataAnnotations;
 
 namespace SchoolWebAPI.Controllers
 {
     [RoutePrefix("api/student")]
+    [CustomLoggerActionFilter]
     public class StudentController : ApiController
     {
         private readonly IStudentRepo studentRepo;
@@ -26,18 +29,21 @@ namespace SchoolWebAPI.Controllers
         public IHttpActionResult Get(int id) => studentRepo.GetStudent(id);
 
         [HttpPost]
-        [Route(Name = "Create")]
+        [CustomAuthorizationFilter]
         public IHttpActionResult Post([FromBody] StudentViewModel model) => studentRepo.Create(ModelState, model);
 
         [HttpPut]
+        [CustomAuthorizationFilter]
         [Route("{id}/update")]
         public IHttpActionResult Put([FromUri] int id, [FromBody] StudentViewModel model) => studentRepo.UpdateStudent(ModelState, id, model);
 
         [HttpDelete]
+        [CustomAuthorizationFilter]
         [Route("{id}/remove")]
         public IHttpActionResult Delete([FromUri] int id) => studentRepo.DeleteStudent(id);
 
         [HttpPost]
+        [CustomAuthorizationFilter]
         [Route("upload/{id:int}")]
         public IHttpActionResult Upload([FromUri] int id) => studentRepo.UploadDocument(id);
 

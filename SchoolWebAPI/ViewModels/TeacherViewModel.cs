@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SchoolWebAPI.Models
+namespace SchoolWebAPI.ViewModels
 {
     public class TeacherViewModel
     {
@@ -10,6 +10,5 @@ namespace SchoolWebAPI.Models
         public int? StandardId { get; set; }
         [Required(ErrorMessage = "Teacher type is required!")]
         public int? TeacherType { get; set; }
-
     }
 }

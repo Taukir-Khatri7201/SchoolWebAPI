@@ -7,18 +7,16 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SchoolWebAPI
+namespace SchoolWebAPI.Models
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class StudentDocuments2
+    public partial class View_StudentCourse
     {
-        public int Id { get; set; }
-        public Nullable<int> StudentId { get; set; }
-        public string FileName { get; set; }
-        public string FileContent { get; set; }
-    
-        public virtual Student Student { get; set; }
+        public int StudentID { get; set; }
+        public string StudentName { get; set; }
+        public int CourseId { get; set; }
+        public string CourseName { get; set; }
     }
 }

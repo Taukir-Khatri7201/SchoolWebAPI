@@ -2,7 +2,7 @@
 using System.Web;
 using System.ComponentModel.DataAnnotations;
 
-namespace SchoolWebAPI.Models
+namespace SchoolWebAPI.ViewModels
 {
     public class FileUploadViewModel
     {

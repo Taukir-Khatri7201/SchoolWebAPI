@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace SchoolWebAPI.Models
+namespace SchoolWebAPI.ViewModels
 {
     public class StandardViewModel
     {

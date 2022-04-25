@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SchoolWebAPI.Models
+namespace SchoolWebAPI.ViewModels
 {
     public class StudentViewModel
     {

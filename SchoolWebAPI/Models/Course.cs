@@ -7,26 +7,26 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SchoolWebAPI
+namespace SchoolWebAPI.Models
 {
     using System;
     using System.Collections.Generic;
     
-    public partial class Teacher
+    public partial class Course
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Teacher()
+        public Course()
         {
-            this.Courses = new HashSet<Course>();
+            this.Students = new HashSet<Student>();
         }
     
-        public int TeacherId { get; set; }
-        public string TeacherName { get; set; }
-        public Nullable<int> StandardId { get; set; }
-        public Nullable<int> TeacherType { get; set; }
+        public int CourseId { get; set; }
+        public string CourseName { get; set; }
+        public System.Data.Entity.Spatial.DbGeography Location { get; set; }
+        public Nullable<int> TeacherId { get; set; }
     
+        public virtual Teacher Teacher { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Course> Courses { get; set; }
-        public virtual Standard Standard { get; set; }
+        public virtual ICollection<Student> Students { get; set; }
     }
 }

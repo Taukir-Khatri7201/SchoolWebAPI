@@ -1,9 +1,12 @@
-﻿using SchoolWebAPI.Models;
+﻿using SchoolWebAPI.ViewModels;
 using SchoolWebAPI.Repositories;
 using System.Web.Http;
+using SchoolWebAPI.Filters;
 
 namespace SchoolWebAPI.Controllers
 {
+    [CustomAuthorizationFilter]
+    [CustomLoggerActionFilter]
     public class TeacherController : ApiController
     {
         private readonly ITeacherRepo teacherRepo;
@@ -13,15 +16,33 @@ namespace SchoolWebAPI.Controllers
             this.teacherRepo = teacherRepo;
         }
 
+        /// <summary>
+        /// Returns a list of all teachers if not provided standardId
+        /// Returns a list of all teachers teaching in standardId provided
+        /// </summary>
+        /// <param name="standardId">standardId in which teacher is teaching</param>
+        /// <returns>Get list of all teachers or teachers teaching in specific standard</returns>
         [HttpGet]
-        public IHttpActionResult Get(int standardId = 0) => teacherRepo.Get(Request, standardId);
+        public IHttpActionResult Get(int standardId = 0) => teacherRepo.Get(standardId);
+
+        [HttpGet]
+        [Route("api/teacher/getbyname/{name:alpha}")]
+        public IHttpActionResult GetTeachersByName(string name) => teacherRepo.GetTeachersByName(name);
+
+        [HttpGet]
+        [Route("api/teacher/getbystandardid/{id:int}")]
+        public IHttpActionResult GetCountOfTeachersInStandard(int id) => teacherRepo.GetCountOfTeachersByStandardId(id);
+
+        [HttpGet]
+        [Route("api/teacher/getCountByStandard")]
+        public IHttpActionResult GetTeacherCountByStandard() => teacherRepo.GetCountByStandard();
+
         [HttpPost]
-        public IHttpActionResult Post([FromBody] TeacherViewModel model = default) => teacherRepo.Create(Request, ModelState, model);
+        public IHttpActionResult Post([FromBody] TeacherViewModel model = default) => teacherRepo.Create(ModelState, model);
         [HttpPut]
-        public IHttpActionResult Put([FromUri] int id, [FromBody] TeacherViewModel model = default)
-                                    => teacherRepo.UpdateTeacher(Request, ModelState, id, model);
+        public IHttpActionResult Put([FromUri] int id, [FromBody] TeacherViewModel model) => teacherRepo.UpdateTeacher(ModelState, id, model);
         [HttpDelete]
-        public IHttpActionResult Delete([FromUri] int id) => teacherRepo.DeleteTeacher(Request, id);
+        public IHttpActionResult Delete([FromUri] int id) => teacherRepo.DeleteTeacher(id);
 
         /*
         private static Logger logger = LogManager.GetCurrentClassLogger();

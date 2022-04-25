@@ -7,14 +7,15 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SchoolWebAPI
+namespace SchoolWebAPI.Models
 {
     using System;
+    using System.Collections.Generic;
     
-    public partial class GetCoursesByStudentId_Result
+    public partial class vWGetNumberOfTeachersByStandard
     {
-        public Nullable<int> courseid { get; set; }
-        public string coursename { get; set; }
-        public Nullable<int> TeacherId { get; set; }
+        public long ID { get; set; }
+        public Nullable<int> StandardId { get; set; }
+        public Nullable<int> Total { get; set; }
     }
 }

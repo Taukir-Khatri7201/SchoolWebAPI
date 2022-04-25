@@ -1,4 +1,4 @@
-﻿using SchoolWebAPI.Models;
+﻿using SchoolWebAPI.ViewModels;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
