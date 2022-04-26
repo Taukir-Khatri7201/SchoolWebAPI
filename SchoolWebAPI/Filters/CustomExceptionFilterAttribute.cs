@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http.Filters;
-using SchoolWebAPI.Repositories;
-using SchoolWebAPI.Utility;
+using DataAccess.Repositories;
+using DataAccess.Utility;
 using Unity;
 
 namespace SchoolWebAPI.Filters

@@ -1,6 +1,4 @@
-﻿using SchoolWebAPI.Models;
-using System;
-using System.Linq;
+﻿using DataAccess.Models;
 
 namespace SchoolWebAPI.Security
 {
@@ -15,10 +13,9 @@ namespace SchoolWebAPI.Security
                 bool result = false;
                 foreach (var credential in context.Logins)
                 {
-                    result |= (credential.Username == username && credential.Password == password);
+                    result |= (string.Compare(credential.Username, username, System.StringComparison.CurrentCultureIgnoreCase)==0 && credential.Password == password);
                     if (result) break;
                 }
-                //bool result = context.Logins.Any(s => s.Username == username && s.Password == password);
                 return result;
             }
         }

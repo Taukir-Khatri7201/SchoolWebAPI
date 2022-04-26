@@ -1,11 +1,8 @@
-﻿using SchoolWebAPI.ViewModels;
+﻿using DataAccess.ViewModels;
 using System.Web.Http;
-using SchoolWebAPI.Repositories;
-using System.Web;
+using DataAccess.Repositories;
 using System.Net.Http;
-using System.Net;
 using SchoolWebAPI.Filters;
-using System.ComponentModel.DataAnnotations;
 
 namespace SchoolWebAPI.Controllers
 {

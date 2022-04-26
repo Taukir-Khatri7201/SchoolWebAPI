@@ -1,7 +1,6 @@
-using SchoolWebAPI.Models;
-using SchoolWebAPI.Repositories;
-using SchoolWebAPI.Utility;
-using System;
+using DataAccess.Models;
+using DataAccess.Repositories;
+using DataAccess.Utility;
 using System.Web.Http;
 using Unity;
 using Unity.WebApi;
