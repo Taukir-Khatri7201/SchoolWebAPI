@@ -255,6 +255,92 @@ namespace SchoolWebAPI.Repositories
                 return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, ex.Message);
             }
         }
+        public IHttpActionResult GetStudentMarks()
+        {
+            try
+            {
+                SqlConnection conn = new SqlConnection();
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["SchoolDBConnection"].ConnectionString;
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandText = "select * from vwStudentMarks";
+                cmd.Connection = conn;
+                var list = new List<vwStudentMark>();
+                try
+                {
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var model = new vwStudentMark()
+                            {
+                                StudentId = (int)reader[0],
+                                StudentName = (string)reader[1],
+                                CourseName = (string)reader[2],
+                                MarksObtained = (int)reader[3],
+                            };
+                            list.Add(model);
+                        }
+                    }
+                    return new CustomResponse<List<vwStudentMark>>(requestMessage, (int)ResultStatus.Success, "", list);
+                }
+                catch (Exception ex)
+                {
+                    return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, ex.Message);
+                }
+                finally
+                {
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, ex.Message);
+            }
+        }
+        public IHttpActionResult GetStudentWithMaxMarksInEachCourse()
+        {
+            try
+            {
+                SqlConnection conn = new SqlConnection();
+                conn.ConnectionString = ConfigurationManager.ConnectionStrings["SchoolDBConnection"].ConnectionString;
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandText = "select * from vwStudentWithMaxMarksInEachCourse";
+                cmd.Connection = conn;
+                var list = new List<vwStudentWithMaxMarksInEachCourse>();
+                try
+                {
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var model = new vwStudentWithMaxMarksInEachCourse()
+                            {
+                                StudentID = (int)reader[0],
+                                StudentName = (string)reader[1],
+                                CourseName = (string)reader[2],
+                                MarksObtained = (int)reader[3],
+                            };
+                            list.Add(model);
+                        }
+                    }
+                    return new CustomResponse<List<vwStudentWithMaxMarksInEachCourse>>(requestMessage, (int)ResultStatus.Success, "", list);
+                }
+                catch (Exception ex)
+                {
+                    return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, ex.Message);
+                }
+                finally
+                {
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                return new CustomResponse<string>(requestMessage, (int)ResultStatus.Failed, ex.Message);
+            }
+        }
         public IHttpActionResult Create(ModelStateDictionary modelState, TeacherViewModel model)
         {
             if (modelState.IsValid)

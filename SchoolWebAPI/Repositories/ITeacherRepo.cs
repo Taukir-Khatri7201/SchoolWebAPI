@@ -11,6 +11,8 @@ namespace SchoolWebAPI.Repositories
         IHttpActionResult GetTeachersByName(string name);
         IHttpActionResult GetCountOfTeachersByStandardId(int id);
         IHttpActionResult GetCountByStandard();
+        IHttpActionResult GetStudentMarks();
+        IHttpActionResult GetStudentWithMaxMarksInEachCourse();
         IHttpActionResult Create(ModelStateDictionary modelState, TeacherViewModel model);
         IHttpActionResult UpdateTeacher(ModelStateDictionary modelState, int id, TeacherViewModel model);
         IHttpActionResult DeleteTeacher(int id);

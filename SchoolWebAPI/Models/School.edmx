@@ -77,6 +77,16 @@ warning 6002: The table/view 'SchoolDB.dbo.Login' does not have a primary key de
           <Property Name="FileName" Type="text" Nullable="false" />
           <Property Name="FileContent" Type="text" Nullable="false" />
         </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'SchoolDB.dbo.StudentMarks' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="StudentMarks">
+          <Key>
+            <PropertyRef Name="MarksObtained" />
+          </Key>
+          <Property Name="StudentId" Type="int" />
+          <Property Name="CourseId" Type="int" />
+          <Property Name="MarksObtained" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="Teacher">
           <Key>
             <PropertyRef Name="TeacherId" />
@@ -108,6 +118,29 @@ warning 6002: The table/view 'SchoolDB.dbo.vWGetNumberOfTeachersByStandard' does
           <Property Name="StandardId" Type="int" />
           <Property Name="Total" Type="int" />
         </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'SchoolDB.dbo.vwStudentMarks' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vwStudentMarks">
+          <Key>
+            <PropertyRef Name="MarksObtained" />
+          </Key>
+          <Property Name="StudentId" Type="int" />
+          <Property Name="StudentName" Type="varchar" MaxLength="50" />
+          <Property Name="CourseName" Type="varchar" MaxLength="50" />
+          <Property Name="MarksObtained" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'SchoolDB.dbo.vwStudentWithMaxMarksInEachCourse' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vwStudentWithMaxMarksInEachCourse">
+          <Key>
+            <PropertyRef Name="StudentID" />
+            <PropertyRef Name="MarksObtained" />
+          </Key>
+          <Property Name="StudentID" Type="int" Nullable="false" />
+          <Property Name="StudentName" Type="varchar" MaxLength="50" />
+          <Property Name="CourseName" Type="varchar" MaxLength="50" />
+          <Property Name="MarksObtained" Type="int" Nullable="false" />
+        </EntityType>
         <Association Name="FK__StudentDo__Stude__5CD6CB2B">
           <End Role="Student" Type="Self.Student" Multiplicity="0..1" />
           <End Role="StudentDocuments" Type="Self.StudentDocuments" Multiplicity="*" />
@@ -128,6 +161,30 @@ warning 6002: The table/view 'SchoolDB.dbo.vWGetNumberOfTeachersByStandard' does
               <PropertyRef Name="StudentID" />
             </Principal>
             <Dependent Role="StudentDocuments2">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__StudentMa__Cours__3C34F16F">
+          <End Role="Course" Type="Self.Course" Multiplicity="0..1" />
+          <End Role="StudentMarks" Type="Self.StudentMarks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Course">
+              <PropertyRef Name="CourseId" />
+            </Principal>
+            <Dependent Role="StudentMarks">
+              <PropertyRef Name="CourseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__StudentMa__Stude__3B40CD36">
+          <End Role="Student" Type="Self.Student" Multiplicity="0..1" />
+          <End Role="StudentMarks" Type="Self.StudentMarks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentID" />
+            </Principal>
+            <Dependent Role="StudentMarks">
               <PropertyRef Name="StudentId" />
             </Dependent>
           </ReferentialConstraint>
@@ -255,6 +312,13 @@ warning 6002: The table/view 'SchoolDB.dbo.vWGetNumberOfTeachersByStandard' does
     [Login].[Password] AS [Password]
     FROM [dbo].[Login] AS [Login]</DefiningQuery>
           </EntitySet>
+          <EntitySet Name="StudentMarks" EntityType="Self.StudentMarks" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [StudentMarks].[StudentId] AS [StudentId], 
+    [StudentMarks].[CourseId] AS [CourseId], 
+    [StudentMarks].[MarksObtained] AS [MarksObtained]
+    FROM [dbo].[StudentMarks] AS [StudentMarks]</DefiningQuery>
+          </EntitySet>
           <EntitySet Name="View_StudentCourse" EntityType="Self.View_StudentCourse" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [View_StudentCourse].[StudentID] AS [StudentID], 
@@ -270,6 +334,22 @@ warning 6002: The table/view 'SchoolDB.dbo.vWGetNumberOfTeachersByStandard' does
     [vWGetNumberOfTeachersByStandard].[Total] AS [Total]
     FROM [dbo].[vWGetNumberOfTeachersByStandard] AS [vWGetNumberOfTeachersByStandard]</DefiningQuery>
           </EntitySet>
+          <EntitySet Name="vwStudentMarks" EntityType="Self.vwStudentMarks" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vwStudentMarks].[StudentId] AS [StudentId], 
+    [vwStudentMarks].[StudentName] AS [StudentName], 
+    [vwStudentMarks].[CourseName] AS [CourseName], 
+    [vwStudentMarks].[MarksObtained] AS [MarksObtained]
+    FROM [dbo].[vwStudentMarks] AS [vwStudentMarks]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vwStudentWithMaxMarksInEachCourse" EntityType="Self.vwStudentWithMaxMarksInEachCourse" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vwStudentWithMaxMarksInEachCourse].[StudentID] AS [StudentID], 
+    [vwStudentWithMaxMarksInEachCourse].[StudentName] AS [StudentName], 
+    [vwStudentWithMaxMarksInEachCourse].[CourseName] AS [CourseName], 
+    [vwStudentWithMaxMarksInEachCourse].[MarksObtained] AS [MarksObtained]
+    FROM [dbo].[vwStudentWithMaxMarksInEachCourse] AS [vwStudentWithMaxMarksInEachCourse]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK__StudentDo__Stude__5CD6CB2B" Association="Self.FK__StudentDo__Stude__5CD6CB2B">
             <End Role="Student" EntitySet="Student" />
             <End Role="StudentDocuments" EntitySet="StudentDocuments" />
@@ -277,6 +357,14 @@ warning 6002: The table/view 'SchoolDB.dbo.vWGetNumberOfTeachersByStandard' does
           <AssociationSet Name="FK__StudentDo__Stude__6FE99F9F" Association="Self.FK__StudentDo__Stude__6FE99F9F">
             <End Role="Student" EntitySet="Student" />
             <End Role="StudentDocuments2" EntitySet="StudentDocuments2" />
+          </AssociationSet>
+          <AssociationSet Name="FK__StudentMa__Cours__3C34F16F" Association="Self.FK__StudentMa__Cours__3C34F16F">
+            <End Role="Course" EntitySet="Course" />
+            <End Role="StudentMarks" EntitySet="StudentMarks" />
+          </AssociationSet>
+          <AssociationSet Name="FK__StudentMa__Stude__3B40CD36" Association="Self.FK__StudentMa__Stude__3B40CD36">
+            <End Role="Student" EntitySet="Student" />
+            <End Role="StudentMarks" EntitySet="StudentMarks" />
           </AssociationSet>
           <AssociationSet Name="FK_Course_Teacher" Association="Self.FK_Course_Teacher">
             <End Role="Teacher" EntitySet="Teacher" />
@@ -317,6 +405,7 @@ warning 6002: The table/view 'SchoolDB.dbo.vWGetNumberOfTeachersByStandard' does
           <Property Name="TeacherId" Type="Int32" />
           <NavigationProperty Name="Teacher" Relationship="Self.FK_Course_Teacher" FromRole="Course" ToRole="Teacher" />
           <NavigationProperty Name="Students" Relationship="Self.StudentCourse" FromRole="Course" ToRole="Student" />
+          <NavigationProperty Name="StudentMarks" Relationship="SchoolDBModel.FK__StudentMa__Cours__3C34F16F" FromRole="Course" ToRole="StudentMark" />
         </EntityType>
         <EntityType Name="Standard">
           <Key>
@@ -341,6 +430,7 @@ warning 6002: The table/view 'SchoolDB.dbo.vWGetNumberOfTeachersByStandard' does
           <NavigationProperty Name="StudentDocuments2" Relationship="Self.FK__StudentDo__Stude__6FE99F9F" FromRole="Student" ToRole="StudentDocuments2" />
           <NavigationProperty Name="StudentAddress" Relationship="Self.FK_StudentAddress_Student" FromRole="Student" ToRole="StudentAddress" />
           <NavigationProperty Name="Courses" Relationship="Self.StudentCourse" FromRole="Student" ToRole="Course" />
+          <NavigationProperty Name="StudentMarks" Relationship="SchoolDBModel.FK__StudentMa__Stude__3B40CD36" FromRole="Student" ToRole="StudentMark" />
         </EntityType>
         <EntityType Name="StudentAddress">
           <Key>
@@ -551,6 +641,17 @@ warning 6002: The table/view 'SchoolDB.dbo.vWGetNumberOfTeachersByStandard' does
           <Parameter Name="Id" Mode="In" Type="Int32" />
           </FunctionImport>
           <EntitySet Name="vWGetNumberOfTeachersByStandards" EntityType="SchoolDBModel.vWGetNumberOfTeachersByStandard" />
+          <EntitySet Name="StudentMarks" EntityType="SchoolDBModel.StudentMark" />
+          <EntitySet Name="vwStudentMarks" EntityType="SchoolDBModel.vwStudentMark" />
+          <AssociationSet Name="FK__StudentMa__Cours__3C34F16F" Association="SchoolDBModel.FK__StudentMa__Cours__3C34F16F">
+            <End Role="Course" EntitySet="Courses" />
+            <End Role="StudentMark" EntitySet="StudentMarks" />
+          </AssociationSet>
+          <AssociationSet Name="FK__StudentMa__Stude__3B40CD36" Association="SchoolDBModel.FK__StudentMa__Stude__3B40CD36">
+            <End Role="Student" EntitySet="Students" />
+            <End Role="StudentMark" EntitySet="StudentMarks" />
+          </AssociationSet>
+          <EntitySet Name="vwStudentWithMaxMarksInEachCourses" EntityType="SchoolDBModel.vwStudentWithMaxMarksInEachCourse" />
         </EntityContainer>
         <ComplexType Name="spGetTeacherByNameWithCount_Result">
           <Property Type="Int32" Name="TotalCount" Nullable="true" />
@@ -572,6 +673,59 @@ warning 6002: The table/view 'SchoolDB.dbo.vWGetNumberOfTeachersByStandard' does
           <Property Name="ID" Type="Int64" Nullable="false" />
           <Property Name="StandardId" Type="Int32" />
           <Property Name="Total" Type="Int32" />
+        </EntityType>
+        <EntityType Name="StudentMark">
+          <Key>
+            <PropertyRef Name="MarksObtained" />
+          </Key>
+          <Property Name="StudentId" Type="Int32" />
+          <Property Name="CourseId" Type="Int32" />
+          <Property Name="MarksObtained" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Course" Relationship="SchoolDBModel.FK__StudentMa__Cours__3C34F16F" FromRole="StudentMark" ToRole="Course" />
+          <NavigationProperty Name="Student" Relationship="SchoolDBModel.FK__StudentMa__Stude__3B40CD36" FromRole="StudentMark" ToRole="Student" />
+        </EntityType>
+        <EntityType Name="vwStudentMark">
+          <Key>
+            <PropertyRef Name="MarksObtained" />
+          </Key>
+          <Property Name="StudentId" Type="Int32" />
+          <Property Name="StudentName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CourseName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="MarksObtained" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="FK__StudentMa__Cours__3C34F16F">
+          <End Type="SchoolDBModel.Course" Role="Course" Multiplicity="0..1" />
+          <End Type="SchoolDBModel.StudentMark" Role="StudentMark" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Course">
+              <PropertyRef Name="CourseId" />
+            </Principal>
+            <Dependent Role="StudentMark">
+              <PropertyRef Name="CourseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__StudentMa__Stude__3B40CD36">
+          <End Type="SchoolDBModel.Student" Role="Student" Multiplicity="0..1" />
+          <End Type="SchoolDBModel.StudentMark" Role="StudentMark" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Student">
+              <PropertyRef Name="StudentID" />
+            </Principal>
+            <Dependent Role="StudentMark">
+              <PropertyRef Name="StudentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="vwStudentWithMaxMarksInEachCourse">
+          <Key>
+            <PropertyRef Name="StudentID" />
+            <PropertyRef Name="MarksObtained" />
+          </Key>
+          <Property Name="StudentID" Type="Int32" Nullable="false" />
+          <Property Name="StudentName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CourseName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="MarksObtained" Type="Int32" Nullable="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -710,6 +864,35 @@ warning 6002: The table/view 'SchoolDB.dbo.vWGetNumberOfTeachersByStandard' does
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="StudentMarks">
+            <EntityTypeMapping TypeName="SchoolDBModel.StudentMark">
+              <MappingFragment StoreEntitySet="StudentMarks">
+                <ScalarProperty Name="MarksObtained" ColumnName="MarksObtained" />
+                <ScalarProperty Name="CourseId" ColumnName="CourseId" />
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vwStudentMarks">
+            <EntityTypeMapping TypeName="SchoolDBModel.vwStudentMark">
+              <MappingFragment StoreEntitySet="vwStudentMarks">
+                <ScalarProperty Name="MarksObtained" ColumnName="MarksObtained" />
+                <ScalarProperty Name="CourseName" ColumnName="CourseName" />
+                <ScalarProperty Name="StudentName" ColumnName="StudentName" />
+                <ScalarProperty Name="StudentId" ColumnName="StudentId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vwStudentWithMaxMarksInEachCourses">
+            <EntityTypeMapping TypeName="SchoolDBModel.vwStudentWithMaxMarksInEachCourse">
+              <MappingFragment StoreEntitySet="vwStudentWithMaxMarksInEachCourse">
+                <ScalarProperty Name="MarksObtained" ColumnName="MarksObtained" />
+                <ScalarProperty Name="CourseName" ColumnName="CourseName" />
+                <ScalarProperty Name="StudentName" ColumnName="StudentName" />
+                <ScalarProperty Name="StudentID" ColumnName="StudentID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -725,7 +908,7 @@ warning 6002: The table/view 'SchoolDB.dbo.vWGetNumberOfTeachersByStandard' does
       <DesignerInfoPropertySet>
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
         <DesignerProperty Name="EnablePluralization" Value="true" />
-        <DesignerProperty Name="IncludeForeignKeysInModel" Value="False" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="True" />
         <DesignerProperty Name="UseLegacyProvider" Value="false" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
       </DesignerInfoPropertySet>

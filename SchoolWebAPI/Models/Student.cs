@@ -20,6 +20,7 @@ namespace SchoolWebAPI.Models
             this.StudentDocuments = new HashSet<StudentDocument>();
             this.StudentDocuments2 = new HashSet<StudentDocuments2>();
             this.Courses = new HashSet<Course>();
+            this.StudentMarks = new HashSet<StudentMark>();
         }
     
         public int StudentID { get; set; }
@@ -35,5 +36,7 @@ namespace SchoolWebAPI.Models
         public virtual StudentAddress StudentAddress { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Course> Courses { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<StudentMark> StudentMarks { get; set; }
     }
 }

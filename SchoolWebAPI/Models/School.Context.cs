@@ -37,6 +37,9 @@ namespace SchoolWebAPI.Models
         public virtual DbSet<Login> Logins { get; set; }
         public virtual DbSet<View_StudentCourse> View_StudentCourse { get; set; }
         public virtual DbSet<vWGetNumberOfTeachersByStandard> vWGetNumberOfTeachersByStandards { get; set; }
+        public virtual DbSet<StudentMark> StudentMarks { get; set; }
+        public virtual DbSet<vwStudentMark> vwStudentMarks { get; set; }
+        public virtual DbSet<vwStudentWithMaxMarksInEachCourse> vwStudentWithMaxMarksInEachCourses { get; set; }
     
         public virtual int GetCoursesByStudentId(Nullable<int> studentId)
         {

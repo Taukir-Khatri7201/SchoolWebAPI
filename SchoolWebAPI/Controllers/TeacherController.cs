@@ -37,6 +37,14 @@ namespace SchoolWebAPI.Controllers
         [Route("api/teacher/getCountByStandard")]
         public IHttpActionResult GetTeacherCountByStandard() => teacherRepo.GetCountByStandard();
 
+        [HttpGet]
+        [Route("api/teacher/getStudentMarks")]
+        public IHttpActionResult GetMarks() => teacherRepo.GetStudentMarks();
+
+        [HttpGet]
+        [Route("api/teacher/getStudentWithHighestMarkInEachCourse")]
+        public IHttpActionResult GetStudentWithHighestMarkInEachCourse() => teacherRepo.GetStudentWithMaxMarksInEachCourse();
+
         [HttpPost]
         public IHttpActionResult Post([FromBody] TeacherViewModel model = default) => teacherRepo.Create(ModelState, model);
         [HttpPut]

@@ -22,6 +22,11 @@
         <AssociationConnector Association="SchoolDBModel.FK_StudentAddress_Student" ManuallyRouted="false" />
         <AssociationConnector Association="SchoolDBModel.StudentCourse" ManuallyRouted="false" />
         <EntityTypeShape EntityType="SchoolDBModel.vWGetNumberOfTeachersByStandard" Width="1.5" PointX="3.375" PointY="3.75" />
+        <EntityTypeShape EntityType="SchoolDBModel.StudentMark" Width="1.5" PointX="12.75" PointY="11.875" />
+        <EntityTypeShape EntityType="SchoolDBModel.vwStudentMark" Width="1.5" PointX="5.375" PointY="0.75" />
+        <AssociationConnector Association="SchoolDBModel.FK__StudentMa__Cours__3C34F16F" />
+        <AssociationConnector Association="SchoolDBModel.FK__StudentMa__Stude__3B40CD36" />
+        <EntityTypeShape EntityType="SchoolDBModel.vwStudentWithMaxMarksInEachCourse" Width="1.5" PointX="5.375" PointY="3.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

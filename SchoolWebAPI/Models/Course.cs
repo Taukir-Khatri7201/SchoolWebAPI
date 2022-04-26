@@ -18,6 +18,7 @@ namespace SchoolWebAPI.Models
         public Course()
         {
             this.Students = new HashSet<Student>();
+            this.StudentMarks = new HashSet<StudentMark>();
         }
     
         public int CourseId { get; set; }
@@ -28,5 +29,7 @@ namespace SchoolWebAPI.Models
         public virtual Teacher Teacher { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Student> Students { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<StudentMark> StudentMarks { get; set; }
     }
 }

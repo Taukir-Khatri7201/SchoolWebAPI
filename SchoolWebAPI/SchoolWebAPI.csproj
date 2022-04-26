@@ -237,6 +237,9 @@
     <Compile Include="Models\StudentDocuments2.cs">
       <DependentUpon>School.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\StudentMark.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Teacher.cs">
       <DependentUpon>School.tt</DependentUpon>
     </Compile>
@@ -244,6 +247,12 @@
       <DependentUpon>School.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\vWGetNumberOfTeachersByStandard.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vwStudentMark.cs">
+      <DependentUpon>School.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\vwStudentWithMaxMarksInEachCourse.cs">
       <DependentUpon>School.tt</DependentUpon>
     </Compile>
     <Compile Include="Utility\LoggerHelper.cs" />
