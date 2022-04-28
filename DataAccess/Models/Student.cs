@@ -19,8 +19,8 @@ namespace DataAccess.Models
         {
             this.StudentDocuments = new HashSet<StudentDocument>();
             this.StudentDocuments2 = new HashSet<StudentDocuments2>();
-            this.Courses = new HashSet<Course>();
             this.StudentMarks = new HashSet<StudentMark>();
+            this.Courses = new HashSet<Course>();
         }
     
         public int StudentID { get; set; }
@@ -33,10 +33,10 @@ namespace DataAccess.Models
         public virtual ICollection<StudentDocument> StudentDocuments { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<StudentDocuments2> StudentDocuments2 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<StudentMark> StudentMarks { get; set; }
         public virtual StudentAddress StudentAddress { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Course> Courses { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<StudentMark> StudentMarks { get; set; }
     }
 }

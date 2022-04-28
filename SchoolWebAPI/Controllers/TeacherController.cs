@@ -1,5 +1,5 @@
 ﻿using DataAccess.ViewModels;
-using DataAccess.Repositories;
+using SchoolWebAPI.Repositories;
 using System.Web.Http;
 using SchoolWebAPI.Filters;
 

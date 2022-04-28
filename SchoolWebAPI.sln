@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolWebAPI", "SchoolWebAP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{47370663-F3C6-42B8-83BB-3C3C9BCD53C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsumeSchoolAPI", "ConsumeSchoolAPI\ConsumeSchoolAPI.csproj", "{8D634C8B-5EC3-4832-A264-8D9D793B590D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{47370663-F3C6-42B8-83BB-3C3C9BCD53C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47370663-F3C6-42B8-83BB-3C3C9BCD53C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47370663-F3C6-42B8-83BB-3C3C9BCD53C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D634C8B-5EC3-4832-A264-8D9D793B590D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D634C8B-5EC3-4832-A264-8D9D793B590D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D634C8B-5EC3-4832-A264-8D9D793B590D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D634C8B-5EC3-4832-A264-8D9D793B590D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

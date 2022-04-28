@@ -14,7 +14,7 @@ namespace DataAccess.Models
     
     public partial class vwStudentMark
     {
-        public Nullable<int> StudentId { get; set; }
+        public int StudentId { get; set; }
         public string StudentName { get; set; }
         public string CourseName { get; set; }
         public int MarksObtained { get; set; }

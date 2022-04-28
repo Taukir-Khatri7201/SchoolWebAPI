@@ -35,19 +35,19 @@ namespace DataAccess.Models
         public virtual DbSet<StudentDocuments2> StudentDocuments2 { get; set; }
         public virtual DbSet<Teacher> Teachers { get; set; }
         public virtual DbSet<Login> Logins { get; set; }
+        public virtual DbSet<StudentMark> StudentMarks { get; set; }
         public virtual DbSet<View_StudentCourse> View_StudentCourse { get; set; }
         public virtual DbSet<vWGetNumberOfTeachersByStandard> vWGetNumberOfTeachersByStandards { get; set; }
-        public virtual DbSet<StudentMark> StudentMarks { get; set; }
         public virtual DbSet<vwStudentMark> vwStudentMarks { get; set; }
         public virtual DbSet<vwStudentWithMaxMarksInEachCourse> vwStudentWithMaxMarksInEachCourses { get; set; }
     
-        public virtual int GetCoursesByStudentId(Nullable<int> studentId)
+        public virtual ObjectResult<GetCoursesByStudentId_Result> GetCoursesByStudentId(Nullable<int> studentId)
         {
             var studentIdParameter = studentId.HasValue ?
                 new ObjectParameter("StudentId", studentId) :
                 new ObjectParameter("StudentId", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("GetCoursesByStudentId", studentIdParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetCoursesByStudentId_Result>("GetCoursesByStudentId", studentIdParameter);
         }
     
         public virtual int sp_DeleteStudent(Nullable<int> studentId)

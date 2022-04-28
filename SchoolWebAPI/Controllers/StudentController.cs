@@ -1,6 +1,6 @@
 ﻿using DataAccess.ViewModels;
 using System.Web.Http;
-using DataAccess.Repositories;
+using SchoolWebAPI.Repositories;
 using System.Net.Http;
 using SchoolWebAPI.Filters;
 
@@ -27,6 +27,7 @@ namespace SchoolWebAPI.Controllers
 
         [HttpPost]
         [CustomAuthorizationFilter]
+        [Route("create")]
         public IHttpActionResult Post([FromBody] StudentViewModel model) => studentRepo.Create(ModelState, model);
 
         [HttpPut]

@@ -1,0 +1,340 @@
+﻿@model CombinedViewModel
+
+@{
+    ViewData["Title"] = "Student Homepage";
+}
+
+<div class="alert alert-success" role="alert" id="successAlert" style="display: none;"></div>
+<div class="alert alert-danger" role="alert" id="errorAlert" style="display: none;"></div>
+
+<div class="row">
+    <div class="col-6">
+        <h3>Students List</h3>
+    </div>
+    <div class="col-6 text-right">
+        <a href="javascript:void(0)" class="btn btn-primary" data-toggle="modal" data-target="#addStudentModal" data-dismiss="modal" title="Add">
+            <span><i class="fa-solid fa-circle-plus"></i></span> Add
+        </a>
+    </div>
+</div>
+
+@if(Model.studentData.Data == null)
+{
+    <div class="alert alert-light" role="alert">
+        @foreach(var msg in Model.studentData.messages)
+        {
+            <span>@msg</span><br />
+        }
+    </div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <th>Student Id</th>
+                <th>Student Name</th>
+                <th>Standard</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @for(int i=0;i<Model.studentData.Data.Count;i++)
+            {
+                var student = Model.studentData.Data[i];
+                <tr>
+                    <td>@student.Id</td>
+                    <td>@student.Name</td>
+                    <td>@student.standardId</td>
+                    <td>
+                        <a href="javascript:void(0)" class="btn btn-primary" id="Edit_@i" data-toggle="modal" data-target="#editModal" data-dismiss="modal" title="Edit">
+                          <span><i class="fa-solid fa-pen-to-square"></i></span> Edit
+                        </a>
+                        <a href="javascript:void(0)" class="btn btn-danger" id="Remove_@i" data-toggle="modal" data-target="#removeModal" data-dismiss="modal" title="Remove">
+                          <span><i class="fa-solid fa-trash-can"></i></span> Remove
+                        </a>
+                        <a href="javascript:void(0)" class="btn btn-success" id="Remove_@i" data-toggle="modal" data-target="#removeModal" data-dismiss="modal" title="Remove">
+                          <span><i class="fa-solid fa-trash-can"></i></span> Download Document
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Edit Student Details</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                     <div class="form-group">
+                        <label asp-for="@Model.studentViewModel.Name">Student Name</label>
+                        <input class="form-control" asp-for="@Model.studentViewModel.Name" placeholder="Enter student name here...">
+                        <span asp-validation-for="@Model.studentViewModel.Name" class="form-text text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="@Model.studentViewModel.standardId">Standard</label>
+                        <input class="form-control" asp-for="@Model.studentViewModel.standardId" placeholder="Enter standard here..." min="1" max="12">
+                        <span asp-validation-for="@Model.studentViewModel.standardId" class="form-text text-danger"></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="updateInfo" data-dismiss="modal">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="removeModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Remove Student</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div>Are you sure you want to remove the following student?</div>
+                    <div>
+                        <div id="removalStudentId"></div>
+                        <div id="removalStudentName"></div>
+                        <div id="removalStudentStandard"></div>
+                    </div> 
+                </div>
+            
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="removeInfo" data-dismiss="modal">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+<div class="modal fade" id="addStudentModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Student</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label asp-for="@Model.addStudent.Name">Student Name</label>
+                        <input class="form-control" asp-for="@Model.addStudent.Name" placeholder="Enter student name here...">
+                        <span asp-validation-for="@Model.addStudent.Name" class="form-text text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="@Model.addStudent.standardId">Standard</label>
+                        <input class="form-control" asp-for="@Model.addStudent.standardId" placeholder="Enter standard here..." min="1" max="12">
+                        <span asp-validation-for="@Model.addStudent.standardId" class="form-text text-danger"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="addStudentInfo" data-dismiss="modal">Add Student</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            let baseURL = 'https://localhost:44361/';
+            let data = JSON.parse('@Html.Raw(Json.Serialize(Model.studentData.Data))');
+            let editModal = $('#editModal');
+            let editModalForm = $('#editModal form')[0];
+            let editModalStudentName = $('#@Html.IdFor(m => m.studentViewModel.Name)');
+            let editModalStandard = $('#@Html.IdFor(m => m.studentViewModel.standardId)');
+            let currentEditId;
+            let currentRemoveId;
+            let editModalValidations = $('#editModal span[data-valmsg-for]');
+            let successAlert = $('#successAlert');
+            let errorAlert = $('#errorAlert');
+            let removalStudentId = $('#removalStudentId');
+            let removalStudentName = $('#removalStudentName');
+            let removalStudentStandard = $('#removalStudentStandard');
+            
+            $('a[id^="Edit_"]').on('click', function() {
+                var id = parseInt($(this).attr('id').split('_')[1]);
+                currentEditId = id;
+                editModalStudentName.val(data[id].name);
+                editModalStandard.val(data[id].standardId);
+            });
+
+            $('a[id^="Remove_"]').on('click', function() {
+                var id = parseInt($(this).attr('id').split('_')[1]);
+                currentRemoveId = id;
+                removalStudentId.val(data[id].id);
+                removalStudentName.val(data[id].name);
+                removalStudentStandard.val(data[id].standardId);
+            });
+
+            $('#updateInfo').on('click', function() {
+                let valid = checkSpans(editModalValidations);
+                
+                if(valid) {
+                    let model = {
+                        Id: data[currentEditId].id,
+                        Name: editModalStudentName.val(),
+                        standardId: parseInt(editModalStandard.val()),
+                    };
+
+                    $.ajax({
+                        type: 'PUT',
+                        url: '@Url.Action("UpdateStudentData", "Student")',
+                        dataType: "json",
+                        data: model,
+                        success: function(res) {
+                            if(res.StatusCode == @((int)ResultStatus.Success)) {
+                                $(successAlert).html(res.messages.join());
+                                $(successAlert).show();
+                                $('html, body').animate({
+                                    scrollTop: window.top
+                                }, 500);
+                                setTimeout(function() {
+                                    window.location.reload(true);
+                                }, 3000);
+                            } else {
+                                $(errorAlert).html(res.messages.join());
+                                $(errorAlert).show();
+                                $('html, body').animate({
+                                    scrollTop: window.top
+                                }, 500);
+                                setTimeout(function() {
+                                    $(errorAlert).hide();
+                                }, 5000);
+                            }
+                        },
+                        error: function(res) {
+                            $(errorAlert).html(JSON.stringify(res));
+                            $(errorAlert).show();
+                            $('html, body').animate({
+                                scrollTop: window.top
+                            }, 500);
+                            setTimeout(function() {
+                                $(errorAlert).hide();
+                            }, 5000);
+                        }
+                    });
+                }
+            });
+
+            $('#removeInfo').on('click', function() {
+                $.ajax({
+                    type: 'DELETE',
+                    url: '@Url.Action("RemoveStudentData", "Student")',
+                    dataType: "json",
+                    data: {id: data[currentRemoveId].id},
+                    success: function(res) {
+                        if(res.StatusCode == @((int)ResultStatus.Success)) {
+                            $(successAlert).html(res.messages.join());
+                            $(successAlert).show();
+                            $('html, body').animate({
+                                scrollTop: window.top
+                            }, 500);
+                            setTimeout(function() {
+                                window.location.reload(true);
+                            }, 3000);
+                        } else {
+                            $(errorAlert).html(res.messages.join());
+                            $(errorAlert).show();
+                            $('html, body').animate({
+                                scrollTop: window.top
+                            }, 500);
+                            setTimeout(function() {
+                                $(errorAlert).hide();
+                            }, 5000);
+                        }
+                    },
+                    error: function(res) {
+                        $(errorAlert).html(JSON.stringify(res));
+                        $(errorAlert).show();
+                        $('html, body').animate({
+                            scrollTop: window.top
+                        }, 500);
+                        setTimeout(function() {
+                            $(errorAlert).hide();
+                        }, 5000);
+                    }
+                });
+            });
+
+            $('#addStudentInfo').on('click', function() {
+                console.log("Clicked");
+                let model = {
+                    Name: $('#@Html.IdFor(m => m.addStudent.Name)').val(),
+                    standardId: parseInt($('#@Html.IdFor(m => m.addStudent.standardId)').val()),
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("AddStudentData", "Student")',
+                    dataType: "json",
+                    data: model,
+                    success: function(res) {
+                        if(res.StatusCode == @((int)ResultStatus.Success)) {
+                            $(successAlert).html(res.messages.join());
+                            $(successAlert).show();
+                            $('html, body').animate({
+                                scrollTop: window.top
+                            }, 500);
+                            setTimeout(function() {
+                                window.location.reload(true);
+                            }, 3000);
+                        } else {
+                            console.log(res);
+                            //$(errorAlert).html(res.messages.join());
+                            $(errorAlert).show();
+                            $('html, body').animate({
+                                scrollTop: window.top
+                            }, 500);
+                            setTimeout(function() {
+                                $(errorAlert).hide();
+                            }, 5000);
+                        }
+                    },
+                    error: function(res) {
+                        $(errorAlert).html(JSON.stringify(res));
+                        $(errorAlert).show();
+                        $('html, body').animate({
+                            scrollTop: window.top
+                        }, 500);
+                        setTimeout(function() {
+                            $(errorAlert).hide();
+                        }, 5000);
+                    }
+                });
+            });
+        });
+
+        function checkSpans(ele) {
+            for(let i=0;i<ele.length;i++) {
+                if($(ele[i]).text().trim().length > 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    </script>
+}
